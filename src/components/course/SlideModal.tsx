@@ -8,6 +8,7 @@ interface Slide {
   content: string;
   code?: string;
   preview?: string;
+  isLastSlide?: boolean;
 }
 
 interface SlideModalProps {
@@ -21,32 +22,23 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') {
-        nextSlide();
-      } else if (e.key === 'ArrowLeft') {
-        previousSlide();
-      } else if (e.key === 'Escape') {
+      if (e.key === 'ArrowRight' && currentSlide < slides.length - 1) {
+        setCurrentSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft' && currentSlide > 0) {
+        setCurrentSlide(currentSlide - 1);
+      } else if (e.key === 'Enter' && slides[currentSlide].isLastSlide) {
         onClose();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentSlide, onClose]);
-
-  const nextSlide = () => {
-    if (currentSlide < slides.length - 1) {
-      setCurrentSlide(currentSlide + 1);
-    }
-  };
-
-  const previousSlide = () => {
-    if (currentSlide > 0) {
-      setCurrentSlide(currentSlide - 1);
-    }
-  };
+  }, [currentSlide, slides, onClose]);
 
   if (!isOpen) return null;
+
+  const currentSlideData = slides[currentSlide];
+  const isLastSlide = currentSlideData.isLastSlide;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
@@ -82,75 +74,95 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
               transition={{ duration: 0.3 }}
               className="flex-1 p-8"
             >
-              <div className="max-w-4xl mx-auto">
-                <div className="flex items-center mb-8">
-                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mr-4">
-                    <span className="text-2xl">★</span>
-                  </div>
-                  <h2 className="text-2xl font-bold">{slides[currentSlide].title}</h2>
+              {isLastSlide ? (
+                <div className="h-full flex flex-col items-center justify-center text-center">
+                  <h2 className="text-3xl font-bold mb-8">
+                    ここでスライドは終わりです。
+                  </h2>
+                  <p className="text-xl mb-12">
+                    演習に進みましょう！
+                  </p>
+                  <button
+                    onClick={onClose}
+                    className="bg-[#19c37d] text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#1a8870] transition-colors flex items-center gap-2"
+                  >
+                    演習に進む (Enter)
+                    <span className="text-2xl">▶</span>
+                  </button>
                 </div>
+              ) : (
+                <div className="max-w-4xl mx-auto">
+                  <div className="flex items-center mb-8">
+                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mr-4">
+                      <span className="text-2xl">★</span>
+                    </div>
+                    <h2 className="text-2xl font-bold">{currentSlideData.title}</h2>
+                  </div>
 
-                <div className="grid grid-cols-2 gap-8">
-                  <div>
-                    <p className="text-lg mb-6">{slides[currentSlide].content}</p>
-                    {slides[currentSlide].code && (
-                      <div className="bg-[#1e1e1e] text-white p-4 rounded-lg">
-                        <pre className="font-mono">
-                          <code>{slides[currentSlide].code}</code>
-                        </pre>
+                  <div className="grid grid-cols-2 gap-8">
+                    <div>
+                      <p className="text-lg mb-6">{currentSlideData.content}</p>
+                      {currentSlideData.code && (
+                        <div className="bg-[#1e1e1e] text-white p-4 rounded-lg">
+                          <pre className="font-mono">
+                            <code>{currentSlideData.code}</code>
+                          </pre>
+                        </div>
+                      )}
+                    </div>
+                    {currentSlideData.preview && (
+                      <div className="bg-white rounded-lg p-4 shadow-lg">
+                        <div className="flex items-center mb-2">
+                          <div className="flex space-x-1">
+                            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                          </div>
+                          <span className="ml-2 text-sm text-gray-500">プレビュー</span>
+                        </div>
+                        <div
+                          dangerouslySetInnerHTML={{ __html: currentSlideData.preview }}
+                          className="preview-content"
+                        />
                       </div>
                     )}
                   </div>
-                  {slides[currentSlide].preview && (
-                    <div className="bg-white rounded-lg p-4 shadow-lg">
-                      <div className="flex items-center mb-2">
-                        <div className="flex space-x-1">
-                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                        </div>
-                        <span className="ml-2 text-sm text-gray-500">プレビュー</span>
-                      </div>
-                      <div
-                        dangerouslySetInnerHTML={{ __html: slides[currentSlide].preview }}
-                        className="preview-content"
-                      />
-                    </div>
-                  )}
                 </div>
-              </div>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
 
         {/* Navigation buttons */}
-        <div className="absolute bottom-8 left-0 right-0 flex justify-between px-8">
-          <button
-            onClick={previousSlide}
-            className={`p-2 rounded ${
-              currentSlide === 0
-                ? 'text-gray-400 cursor-not-allowed'
-                : 'text-gray-700 hover:bg-gray-200'
-            }`}
-            disabled={currentSlide === 0}
-          >
-            ← 前へ
-          </button>
-          <div className="text-gray-600">
-            {currentSlide + 1} / {slides.length}
+        {!isLastSlide && (
+          <div className="absolute bottom-8 left-0 right-0 flex justify-between px-8">
+            <button
+              onClick={() => setCurrentSlide(currentSlide - 1)}
+              className={`p-2 rounded ${
+                currentSlide === 0
+                  ? 'text-gray-400 cursor-not-allowed'
+                  : 'text-gray-700 hover:bg-gray-200'
+              }`}
+              disabled={currentSlide === 0}
+            >
+              ← 前へ
+            </button>
+            <div className="text-gray-600">
+              {currentSlide + 1} / {slides.length}
+            </div>
+            <button
+              onClick={() => setCurrentSlide(currentSlide + 1)}
+              className={`p-2 rounded ${
+                currentSlide === slides.length - 1
+                  ? 'text-gray-400 cursor-not-allowed'
+                  : 'text-gray-700 hover:bg-gray-200'
+              }`}
+              disabled={currentSlide === slides.length - 1}
+            >
+              次へ →
+            </button>
           </div>
-          <button
-            onClick={nextSlide}
-            className={`p-2 rounded ${
-              currentSlide === slides.length - 1
-                ? 'text-gray-400 cursor-not-allowed'
-                : 'text-gray-700 hover:bg-gray-200'
-            }`}
-            disabled={currentSlide === slides.length - 1}
-          >
-            次へ →
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );
