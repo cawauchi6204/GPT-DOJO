@@ -34,7 +34,6 @@ const courses = [
 ];
 
 const categories = ['すべて', '基礎', 'ビジネス', '専門', 'クリエイティブ', 'データ', '教育'];
-const levels = ['すべて', '初級', '中級', '上級'];
 
 export default function Courses() {
   const router = useRouter();
@@ -59,19 +58,6 @@ export default function Courses() {
                   className="px-4 py-2 rounded-full border border-gray-300 hover:border-indigo-600 hover:text-indigo-600"
                 >
                   {category}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold mb-2">レベル</h2>
-            <div className="flex flex-wrap gap-2">
-              {levels.map((level) => (
-                <button
-                  key={level}
-                  className="px-4 py-2 rounded-full border border-gray-300 hover:border-indigo-600 hover:text-indigo-600"
-                >
-                  {level}
                 </button>
               ))}
             </div>
