@@ -1,145 +1,142 @@
 'use client';
 
 import Layout from '@/components/layout/Layout';
-import PreviewPane from '@/components/course/PreviewPane';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 // ダミーデータ
-const lessonContent = {
-  title: 'HTMLに触れてみよう！',
-  description: `
-では早速HTMLに触れてみましょう。
-「エディタ」に、コードを入力していきます。「プレビュー」が、その結果です。
-
-「Hello World」というテキストを
-
-・開始タグ <h1>
-・終了タグ </h1>
-
-で囲んでください。
-
-「見本」のようになりましたか？
-終わったら、「できた！」をクリックしてください。
-  `,
-  expectedOutput: '<h1>Hello World</h1>',
+const courseDetails = {
+  id: 'marketing-basic',
+  title: 'マーケティング',
+  subtitle: 'ビジネスの基礎を学ぶ',
+  description: 'マーケティングの基礎から実践的な戦略立案まで、ビジネスで必要な知識とスキルを身につけます。',
+  lessons: [
+    {
+      id: 'basic',
+      type: '学習レッスン',
+      title: 'マーケティング 初級編',
+      description: 'マーケティングの基本概念や4Pの考え方、顧客分析の手法など、マーケティングの基礎を学びます。実際のビジネスケースを交えながら、実践的な知識を身につけていきましょう。',
+      duration: '2h30m',
+      progress: 0,
+    },
+    {
+      id: 'strategy',
+      type: '学習レッスン',
+      title: 'マーケティング戦略立案',
+      description: '市場分析、競合分析、STP戦略の立て方など、実践的なマーケティング戦略の立案方法を学びます。実際のビジネスシーンで活用できるフレームワークやツールの使い方も習得します。',
+      duration: '3h45m',
+      progress: 0,
+    },
+    {
+      id: 'digital',
+      type: '学習レッスン',
+      title: 'デジタルマーケティング基礎',
+      description: 'SNSマーケティング、コンテンツマーケティング、SEOなど、現代のビジネスに不可欠なデジタルマーケティングの基礎を学びます。',
+      duration: '4h00m',
+      progress: 0,
+    },
+    {
+      id: 'exercise',
+      type: '道場レッスン',
+      title: 'マーケティング戦略演習',
+      description: '学んだマーケティングの知識を活かして、実際のビジネスケースに取り組みます。市場分析から戦略立案まで、実践的な演習に挑戦しましょう。',
+      duration: '3h00m',
+      progress: 0,
+      isExercise: true,
+    }
+  ]
 };
 
 export default function CourseDetail() {
-  const [userInput, setUserInput] = useState('');
-  const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([]);
+  const router = useRouter();
 
-  const handleSubmit = async () => {
-    if (!userInput.trim()) return;
-
-    // ユーザーの入力をメッセージリストに追加
-    setMessages(prev => [...prev, { role: 'user', content: userInput }]);
-    
-    // ChatGPTのような応答をシミュレート
-    setTimeout(() => {
-      let response = '';
-      if (userInput.includes('<h1>') && userInput.includes('</h1>')) {
-        response = 'よく書けています！HTMLのタグを正しく使えていますね。次のステップに進みましょう。';
-      } else {
-        response = 'HTMLのタグを使って文字を囲んでみましょう。<h1>タグと</h1>タグで囲むことで、見出しとして表示されます。';
-      }
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: response
-      }]);
-    }, 500);
-
-    setUserInput('');
-  };
-
-  const handleReset = () => {
-    setUserInput('');
-    setMessages([]);
-  };
-
-  const handleShowAnswer = () => {
-    setUserInput(lessonContent.expectedOutput);
+  const handleStartLesson = () => {
+    router.push('/study');
   };
 
   return (
     <Layout>
-      <div className="flex h-[calc(100vh-64px)]">
-        {/* 左側：レッスン説明 */}
-        <div className="w-1/2 bg-gray-50 p-6 overflow-y-auto">
-          <div className="max-w-2xl mx-auto">
-            <h1 className="text-2xl font-bold mb-4">{lessonContent.title}</h1>
-            <div className="prose">
-              {lessonContent.description.split('\n').map((line, index) => (
-                <p key={index} className="mb-4">{line}</p>
-              ))}
-            </div>
-            <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-              <h2 className="font-semibold mb-2">見本</h2>
-              <code className="block bg-white p-3 rounded">
-                {lessonContent.expectedOutput}
-              </code>
-            </div>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* コースヘッダー */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-2">{courseDetails.title}</h1>
+          <p className="text-xl text-gray-600">{courseDetails.subtitle}</p>
         </div>
 
-        {/* 右側：ChatGPTスタイルのインターフェース */}
-        <div className="w-1/2 bg-[#343541] flex flex-col">
-          {/* メッセージ表示エリア */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${
-                  message.role === 'assistant' ? 'bg-[#444654]' : ''
-                } p-4 rounded`}
-              >
-                <div className={`flex-1 text-white whitespace-pre-wrap`}>
-                  {message.content}
+        {/* レッスン一覧 */}
+        <div className="space-y-8">
+          {courseDetails.lessons.map((lesson) => (
+            <div key={lesson.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="flex">
+                {/* 左側：アイコンと進捗 */}
+                <div className="w-64 bg-[#e6f7f5] p-8 flex flex-col items-center justify-center">
+                  <div className="relative w-32 h-32 mb-4">
+                    <div className="w-full h-full rounded-full border-4 border-[#4bc3c3] flex items-center justify-center">
+                      <Image
+                        src="/lesson-icon.png"
+                        alt="Lesson icon"
+                        width={80}
+                        height={80}
+                        className="opacity-50"
+                      />
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-gray-500">{lesson.progress}%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 右側：レッスン情報 */}
+                <div className="flex-1 p-8">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <span className={`inline-block px-3 py-1 rounded-full text-sm ${
+                        lesson.isExercise 
+                          ? 'bg-red-100 text-red-800' 
+                          : 'bg-[#e6f7f5] text-[#4bc3c3]'
+                      } mb-2`}>
+                        {lesson.type}
+                      </span>
+                      <h2 className="text-2xl font-bold">{lesson.title}</h2>
+                    </div>
+                    <div className="flex items-center text-gray-500">
+                      <span className="mr-2">🕒</span>
+                      <span>{lesson.duration}</span>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 mb-6">{lesson.description}</p>
+                  <div className="flex justify-between items-center">
+                    <button
+                      onClick={handleStartLesson}
+                      className="bg-[#4bc3c3] text-white px-6 py-2 rounded hover:bg-[#3da3a3] transition-colors"
+                    >
+                      レッスンを始める
+                    </button>
+                    <button className="text-gray-500 hover:text-gray-700">
+                      レッスン詳細へ →
+                    </button>
+                  </div>
                 </div>
               </div>
-            ))}
-            {userInput && (
-              <div className="bg-[#444654] p-4 rounded">
-                <PreviewPane htmlContent={userInput} />
-              </div>
-            )}
-          </div>
-
-          {/* 入力エリア */}
-          <div className="border-t border-gray-600 p-4">
-            <div className="max-w-3xl mx-auto flex gap-4">
-              <textarea
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                className="flex-1 bg-[#40414f] text-white rounded-lg p-3 resize-none"
-                rows={3}
-                placeholder="HTMLコードを入力してください..."
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit();
-                  }
-                }}
-              />
-              <button
-                onClick={handleSubmit}
-                className="bg-[#19c37d] text-white px-4 py-2 rounded-lg hover:bg-[#1a8870] transition-colors"
-              >
-                送信
-              </button>
             </div>
-            <div className="flex justify-between mt-4 max-w-3xl mx-auto">
-              <button 
-                onClick={handleReset}
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                リセット
-              </button>
-              <button 
-                onClick={handleShowAnswer}
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                答えを見る
-              </button>
+          ))}
+        </div>
+
+        {/* チャレンジセクション */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold mb-6">チャレンジしてみよう！</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* チャレンジカード */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-2">道場レッスン</h3>
+                <p className="text-gray-600 mb-4">
+                  学んだマーケティングの知識を活かして、実際のビジネスケースに挑戦してみましょう。
+                </p>
+                <button className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 transition-colors">
+                  チャレンジする
+                </button>
+              </div>
             </div>
           </div>
         </div>

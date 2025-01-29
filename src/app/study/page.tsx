@@ -6,21 +6,67 @@ import SlideModal from '@/components/course/SlideModal';
 
 const slides = [
   {
-    title: 'HTMLの仕組み',
-    content: 'まずはHTMLについて勉強していきましょう。HTMLでは、テキストに「タグ」と呼ばれる印を付けていきます。図のようにテキストをタグで囲むことにより、テキストが「見出し」や「リンク」といった意味をもつことになります。',
-    code: '<h1>プログラミングの世界へようこそ</h1>\n<a>Progate</a>',
-    preview: '<h1>プログラミングの世界へようこそ</h1><a href="#">Progate</a>'
+    title: 'マーケティングの基礎',
+    content: 'マーケティングとは、顧客のニーズを理解し、それに応える価値を提供するプロセスです。今回は、マーケティングの基本概念について学んでいきましょう。',
+    code: `マーケティングの4P
+
+1. Product（製品）
+2. Price（価格）
+3. Place（流通）
+4. Promotion（プロモーション）`,
+    preview: `
+    <div style="padding: 20px; background: #f5f5f5; border-radius: 8px;">
+      <h2 style="color: #333; margin-bottom: 16px;">マーケティングの4P</h2>
+      <ul style="list-style-type: none; padding: 0;">
+        <li style="margin-bottom: 8px;">✓ Product（製品）</li>
+        <li style="margin-bottom: 8px;">✓ Price（価格）</li>
+        <li style="margin-bottom: 8px;">✓ Place（流通）</li>
+        <li style="margin-bottom: 8px;">✓ Promotion（プロモーション）</li>
+      </ul>
+    </div>`
   },
   {
-    title: 'タグの基本',
-    content: 'HTMLのタグは、開始タグと終了タグでテキストを囲みます。開始タグは<>で、終了タグは</>で囲まれています。',
-    code: '<h1>Hello World</h1>',
-    preview: '<h1>Hello World</h1>'
+    title: 'ターゲット市場の分析',
+    content: '効果的なマーケティング戦略を立てるためには、まずターゲット市場を理解する必要があります。STP分析の手法を使って、市場を分析していきましょう。',
+    code: `STP分析の3ステップ
+
+1. Segmentation（市場細分化）
+2. Targeting（ターゲット選定）
+3. Positioning（ポジショニング）`,
+    preview: `
+    <div style="padding: 20px; background: #f5f5f5; border-radius: 8px;">
+      <h2 style="color: #333; margin-bottom: 16px;">STP分析</h2>
+      <div style="margin-bottom: 16px;">
+        <h3 style="color: #666;">Step 1: Segmentation</h3>
+        <p>市場を意味のある単位に分割</p>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <h3 style="color: #666;">Step 2: Targeting</h3>
+        <p>最適なターゲット市場を選択</p>
+      </div>
+      <div>
+        <h3 style="color: #666;">Step 3: Positioning</h3>
+        <p>競合との差別化を図る</p>
+      </div>
+    </div>`
   },
   {
     title: '実践演習',
-    content: 'では、実際にHTMLタグを使ってテキストを装飾してみましょう。右側のエディタに、指示されたタグを入力してください。',
-    code: '<!-- ここにコードを入力してください -->',
+    content: 'では、実際にSTP分析を行ってみましょう。架空の商品について、市場分析を行っていきます。',
+    code: `/* 分析例を入力してください */
+
+1. Segmentation:
+   - 年齢層
+   - 所得層
+   - ライフスタイル
+   
+2. Target Market:
+   - 主要ターゲット
+   - 市場規模
+   
+3. Positioning:
+   - 独自の価値提案
+   - 競合との差別化`,
     preview: '結果がここに表示されます'
   },
   {
@@ -44,10 +90,12 @@ export default function Study() {
     // ChatGPTのような応答をシミュレート
     setTimeout(() => {
       let response = '';
-      if (userInput.includes('<h1>') && userInput.includes('</h1>')) {
-        response = 'よく書けています！HTMLのタグを正しく使えていますね。次のステップに進みましょう。';
+      if (userInput.toLowerCase().includes('segmentation') && 
+          userInput.toLowerCase().includes('targeting') && 
+          userInput.toLowerCase().includes('positioning')) {
+        response = 'よく書けています！STP分析の3つの要素を正しく理解できていますね。次のステップに進みましょう。';
       } else {
-        response = 'HTMLのタグを使って文字を囲んでみましょう。<h1>タグと</h1>タグで囲むことで、見出しとして表示されます。';
+        response = 'STP分析の3つの要素（Segmentation、Targeting、Positioning）について考えてみましょう。それぞれの要素が市場分析でどのような役割を果たすか、整理してみてください。';
       }
       setMessages(prev => [...prev, {
         role: 'assistant',
@@ -64,16 +112,18 @@ export default function Study() {
         {/* 左側：説明エリア */}
         <div className="w-1/2 bg-gray-50 p-6 overflow-y-auto">
           <div className="max-w-2xl mx-auto">
-            <h1 className="text-2xl font-bold mb-4">HTMLに触れてみよう！</h1>
+            <h1 className="text-2xl font-bold mb-4">マーケティング分析に挑戦！</h1>
             <div className="prose">
               <p className="mb-4">
-                では早速HTMLに触れてみましょう。「エディタ」に、コードを入力していきます。
-                「プレビュー」が、その結果です。
+                STP分析を使って、市場分析を行っていきましょう。
+                右側のエディタに、分析結果を入力してください。
               </p>
               <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-                <h2 className="font-semibold mb-2">見本</h2>
+                <h2 className="font-semibold mb-2">分析例</h2>
                 <code className="block bg-white p-3 rounded">
-                  {'<h1>Hello World</h1>'}
+                  {`1. Segmentation（市場細分化）
+2. Targeting（ターゲット選定）
+3. Positioning（ポジショニング）`}
                 </code>
               </div>
             </div>
@@ -96,13 +146,6 @@ export default function Study() {
                 </div>
               </div>
             ))}
-            {userInput && (
-              <div className="bg-[#444654] p-4 rounded">
-                <div className="bg-white rounded p-4">
-                  <div dangerouslySetInnerHTML={{ __html: userInput }} />
-                </div>
-              </div>
-            )}
           </div>
 
           {/* 入力エリア */}
@@ -113,7 +156,7 @@ export default function Study() {
                 onChange={(e) => setUserInput(e.target.value)}
                 className="flex-1 bg-[#40414f] text-white rounded-lg p-3 resize-none"
                 rows={3}
-                placeholder="HTMLコードを入力してください..."
+                placeholder="分析結果を入力してください..."
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
