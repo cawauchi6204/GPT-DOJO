@@ -1,110 +1,136 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Layout from '@/components/layout/Layout';
-import SlideModal from '@/components/course/SlideModal';
+import { useState, useEffect } from "react";
+import Layout from "@/components/layout/Layout";
+import SlideModal from "@/components/course/SlideModal";
+import { lessonRepository, progressRepository } from "@/lib/supabase/client";
+import type { Database } from "@/database.types";
 
-const slides = [
-  {
-    title: 'マーケティングの基礎',
-    content: 'マーケティングとは、顧客のニーズを理解し、それに応える価値を提供するプロセスです。今回は、マーケティングの基本概念について学んでいきましょう。',
-    code: `マーケティングの4P
+type Lesson = Database["public"]["Tables"]["lessons"]["Row"] & {
+  course?: Database["public"]["Tables"]["courses"]["Row"] | null;
+  slides?: Database["public"]["Tables"]["slides"]["Row"][];
+};
 
-1. Product（製品）
-2. Price（価格）
-3. Place（流通）
-4. Promotion（プロモーション）`,
-    preview: `
-    <div style="padding: 20px; background: #f5f5f5; border-radius: 8px;">
-      <h2 style="color: #333; margin-bottom: 16px;">マーケティングの4P</h2>
-      <ul style="list-style-type: none; padding: 0;">
-        <li style="margin-bottom: 8px;">✓ Product（製品）</li>
-        <li style="margin-bottom: 8px;">✓ Price（価格）</li>
-        <li style="margin-bottom: 8px;">✓ Place（流通）</li>
-        <li style="margin-bottom: 8px;">✓ Promotion（プロモーション）</li>
-      </ul>
-    </div>`
-  },
-  {
-    title: 'ターゲット市場の分析',
-    content: '効果的なマーケティング戦略を立てるためには、まずターゲット市場を理解する必要があります。STP分析の手法を使って、市場を分析していきましょう。',
-    code: `STP分析の3ステップ
-
-1. Segmentation（市場細分化）
-2. Targeting（ターゲット選定）
-3. Positioning（ポジショニング）`,
-    preview: `
-    <div style="padding: 20px; background: #f5f5f5; border-radius: 8px;">
-      <h2 style="color: #333; margin-bottom: 16px;">STP分析</h2>
-      <div style="margin-bottom: 16px;">
-        <h3 style="color: #666;">Step 1: Segmentation</h3>
-        <p>市場を意味のある単位に分割</p>
-      </div>
-      <div style="margin-bottom: 16px;">
-        <h3 style="color: #666;">Step 2: Targeting</h3>
-        <p>最適なターゲット市場を選択</p>
-      </div>
-      <div>
-        <h3 style="color: #666;">Step 3: Positioning</h3>
-        <p>競合との差別化を図る</p>
-      </div>
-    </div>`
-  },
-  {
-    title: '実践演習',
-    content: 'では、実際にSTP分析を行ってみましょう。架空の商品について、市場分析を行っていきます。',
-    code: `/* 分析例を入力してください */
-
-1. Segmentation:
-   - 年齢層
-   - 所得層
-   - ライフスタイル
-   
-2. Target Market:
-   - 主要ターゲット
-   - 市場規模
-   
-3. Positioning:
-   - 独自の価値提案
-   - 競合との差別化`,
-    preview: '結果がここに表示されます'
-  },
-  {
-    title: 'スライド終了',
-    content: 'ここでスライドは終わりです。\n演習に進みましょう！',
-    isLastSlide: true
-  }
-];
-
-export default function Study() {
+export default function Study({
+  searchParams,
+}: {
+  searchParams: { lessonId?: string };
+}) {
   const [isModalOpen, setIsModalOpen] = useState(true);
-  const [userInput, setUserInput] = useState('');
-  const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([]);
+  const [userInput, setUserInput] = useState("");
+  const [messages, setMessages] = useState<
+    { role: "user" | "assistant"; content: string }[]
+  >([]);
+  const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchLesson = async () => {
+      if (!searchParams.lessonId) {
+        setError("レッスンIDが指定されていません");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const data = await lessonRepository.getLessonById(
+          searchParams.lessonId
+        );
+        setLesson(data as Lesson);
+        if (data?.course_id) {
+          // ユーザーの進捗を更新（実際の実装ではユーザーIDを使用）
+          await progressRepository.updateProgress(
+            "dummy-user-id",
+            data.course_id,
+            data.id,
+            {
+              status: "in_progress",
+              progress_percentage: 0,
+            }
+          );
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "レッスンの読み込みに失敗しました"
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLesson();
+  }, [searchParams.lessonId]);
 
   const handleSubmit = async () => {
-    if (!userInput.trim()) return;
+    if (!userInput.trim() || !lesson?.course_id) return;
 
     // ユーザーの入力をメッセージリストに追加
-    setMessages(prev => [...prev, { role: 'user', content: userInput }]);
-    
+    setMessages((prev) => [...prev, { role: "user", content: userInput }]);
+
     // ChatGPTのような応答をシミュレート
     setTimeout(() => {
-      let response = '';
-      if (userInput.toLowerCase().includes('segmentation') && 
-          userInput.toLowerCase().includes('targeting') && 
-          userInput.toLowerCase().includes('positioning')) {
-        response = 'よく書けています！STP分析の3つの要素を正しく理解できていますね。次のステップに進みましょう。';
+      let response = "";
+      if (
+        userInput.toLowerCase().includes("segmentation") &&
+        userInput.toLowerCase().includes("targeting") &&
+        userInput.toLowerCase().includes("positioning")
+      ) {
+        response =
+          "よく書けています！STP分析の3つの要素を正しく理解できていますね。次のステップに進みましょう。";
+
+        // 進捗を更新
+        if (lesson.course_id) {
+          progressRepository.updateProgress(
+            "dummy-user-id",
+            lesson.course_id,
+            lesson.id,
+            {
+              status: "in_progress",
+              progress_percentage: 50,
+            }
+          );
+        }
       } else {
-        response = 'STP分析の3つの要素（Segmentation、Targeting、Positioning）について考えてみましょう。それぞれの要素が市場分析でどのような役割を果たすか、整理してみてください。';
+        response =
+          "STP分析の3つの要素（Segmentation、Targeting、Positioning）について考えてみましょう。それぞれの要素が市場分析でどのような役割を果たすか、整理してみてください。";
       }
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: response
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: response,
+        },
+      ]);
     }, 500);
 
-    setUserInput('');
+    setUserInput("");
   };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-indigo-600"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error || !lesson) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="text-red-600">
+            <h2 className="text-2xl font-bold mb-2">エラーが発生しました</h2>
+            <p>{error || "レッスンが見つかりません"}</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -112,18 +138,13 @@ export default function Study() {
         {/* 左側：説明エリア */}
         <div className="w-1/2 bg-gray-50 p-6 overflow-y-auto">
           <div className="max-w-2xl mx-auto">
-            <h1 className="text-2xl font-bold mb-4">マーケティング分析に挑戦！</h1>
+            <h1 className="text-2xl font-bold mb-4">{lesson.title}</h1>
             <div className="prose">
-              <p className="mb-4">
-                STP分析を使って、市場分析を行っていきましょう。
-                右側のエディタに、分析結果を入力してください。
-              </p>
+              <p className="mb-4">{lesson.description}</p>
               <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-                <h2 className="font-semibold mb-2">分析例</h2>
+                <h2 className="font-semibold mb-2">見本</h2>
                 <code className="block bg-white p-3 rounded">
-                  {`1. Segmentation（市場細分化）
-2. Targeting（ターゲット選定）
-3. Positioning（ポジショニング）`}
+                  {lesson.content}
                 </code>
               </div>
             </div>
@@ -138,7 +159,7 @@ export default function Study() {
               <div
                 key={index}
                 className={`flex ${
-                  message.role === 'assistant' ? 'bg-[#444654]' : ''
+                  message.role === "assistant" ? "bg-[#444654]" : ""
                 } p-4 rounded`}
               >
                 <div className={`flex-1 text-white whitespace-pre-wrap`}>
@@ -158,7 +179,7 @@ export default function Study() {
                 rows={3}
                 placeholder="分析結果を入力してください..."
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
+                  if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     handleSubmit();
                   }
@@ -176,11 +197,19 @@ export default function Study() {
       </div>
 
       {/* スライドモーダル */}
-      <SlideModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        slides={slides}
-      />
+      {lesson.slides && (
+        <SlideModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          slides={lesson.slides.map((slide) => ({
+            title: slide.title,
+            content: slide.content || "",
+            code: slide.code_example || undefined,
+            preview: slide.preview_content || undefined,
+            isLastSlide: slide.order_index === (lesson.slides?.length || 0) - 1,
+          }))}
+        />
+      )}
     </Layout>
   );
 }

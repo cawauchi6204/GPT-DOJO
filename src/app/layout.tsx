@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -28,15 +29,16 @@ export const metadata: Metadata = {
     description: 'ChatGPTの基礎から応用まで、実践的なスキルを楽しく学べるオンライン学習プラットフォーム。',
     images: ['/og-image.png'],
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-  },
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 }
 
 export default function RootLayout({

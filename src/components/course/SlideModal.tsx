@@ -9,6 +9,14 @@ interface Slide {
   code?: string;
   preview?: string;
   isLastSlide?: boolean;
+  type?: 'title' | 'content' | 'code' | 'image';
+  style?: {
+    background_color?: string;
+    theme?: 'light' | 'dark';
+    layout?: string;
+  };
+  transition?: 'slide' | 'fade';
+  thumbnail_url?: string;
 }
 
 interface SlideModalProps {
@@ -16,6 +24,19 @@ interface SlideModalProps {
   onClose: () => void;
   slides: Slide[];
 }
+
+const transitions = {
+  slide: {
+    initial: { opacity: 0, x: 100 },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -100 },
+  },
+  fade: {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+  },
+};
 
 export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -39,14 +60,92 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
 
   const currentSlideData = slides[currentSlide];
   const isLastSlide = currentSlideData.isLastSlide;
+  const transitionType = currentSlideData.transition || 'slide';
+  const slideStyle = currentSlideData.style || {};
+  const theme = slideStyle.theme || 'light';
+
+  const renderSlideContent = () => {
+    switch (currentSlideData.type) {
+      case 'title':
+        return (
+          <div className="text-center">
+            <h1 className="text-4xl font-bold mb-6">{currentSlideData.title}</h1>
+            <p className="text-xl">{currentSlideData.content}</p>
+          </div>
+        );
+      case 'code':
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-4">{currentSlideData.title}</h2>
+            <p className="mb-6">{currentSlideData.content}</p>
+            <div className="bg-[#1e1e1e] text-white p-4 rounded-lg">
+              <pre className="font-mono">
+                <code>{currentSlideData.code}</code>
+              </pre>
+            </div>
+          </div>
+        );
+      case 'image':
+        return (
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-4">{currentSlideData.title}</h2>
+            {currentSlideData.thumbnail_url && (
+              <img
+                src={currentSlideData.thumbnail_url}
+                alt={currentSlideData.title}
+                className="mx-auto max-w-full h-auto rounded-lg"
+              />
+            )}
+            <p className="mt-6">{currentSlideData.content}</p>
+          </div>
+        );
+      default:
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-4">{currentSlideData.title}</h2>
+            <p className="mb-6">{currentSlideData.content}</p>
+            {currentSlideData.code && (
+              <div className="bg-[#1e1e1e] text-white p-4 rounded-lg">
+                <pre className="font-mono">
+                  <code>{currentSlideData.code}</code>
+                </pre>
+              </div>
+            )}
+            {currentSlideData.preview && (
+              <div className="mt-6 bg-white rounded-lg p-4 shadow-lg">
+                <div className="flex items-center mb-2">
+                  <div className="flex space-x-1">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  </div>
+                  <span className="ml-2 text-sm text-gray-500">プレビュー</span>
+                </div>
+                <div
+                  dangerouslySetInnerHTML={{ __html: currentSlideData.preview }}
+                  className="preview-content"
+                />
+              </div>
+            )}
+          </div>
+        );
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className="bg-[#e6f3ff] w-full max-w-6xl h-[80vh] rounded-lg relative overflow-hidden">
+      <div 
+        className={`w-full max-w-6xl h-[80vh] rounded-lg relative overflow-hidden ${
+          theme === 'dark' ? 'bg-[#1e1e1e] text-white' : 'bg-[#e6f3ff] text-gray-900'
+        }`}
+        style={{
+          backgroundColor: slideStyle.background_color,
+        }}
+      >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 z-10"
+          className="absolute top-4 right-4 text-current hover:text-gray-600 z-10"
         >
           <svg
             className="w-6 h-6"
@@ -68,9 +167,9 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
+              initial={transitions[transitionType].initial}
+              animate={transitions[transitionType].animate}
+              exit={transitions[transitionType].exit}
               transition={{ duration: 0.3 }}
               className="flex-1 p-8"
             >
@@ -92,41 +191,7 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
                 </div>
               ) : (
                 <div className="max-w-4xl mx-auto">
-                  <div className="flex items-center mb-8">
-                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mr-4">
-                      <span className="text-2xl">★</span>
-                    </div>
-                    <h2 className="text-2xl font-bold">{currentSlideData.title}</h2>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-8">
-                    <div>
-                      <p className="text-lg mb-6">{currentSlideData.content}</p>
-                      {currentSlideData.code && (
-                        <div className="bg-[#1e1e1e] text-white p-4 rounded-lg">
-                          <pre className="font-mono">
-                            <code>{currentSlideData.code}</code>
-                          </pre>
-                        </div>
-                      )}
-                    </div>
-                    {currentSlideData.preview && (
-                      <div className="bg-white rounded-lg p-4 shadow-lg">
-                        <div className="flex items-center mb-2">
-                          <div className="flex space-x-1">
-                            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                          </div>
-                          <span className="ml-2 text-sm text-gray-500">プレビュー</span>
-                        </div>
-                        <div
-                          dangerouslySetInnerHTML={{ __html: currentSlideData.preview }}
-                          className="preview-content"
-                        />
-                      </div>
-                    )}
-                  </div>
+                  {renderSlideContent()}
                 </div>
               )}
             </motion.div>
@@ -141,13 +206,13 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
               className={`p-2 rounded ${
                 currentSlide === 0
                   ? 'text-gray-400 cursor-not-allowed'
-                  : 'text-gray-700 hover:bg-gray-200'
+                  : 'text-current hover:bg-gray-200/20'
               }`}
               disabled={currentSlide === 0}
             >
               ← 前へ
             </button>
-            <div className="text-gray-600">
+            <div className="text-current">
               {currentSlide + 1} / {slides.length}
             </div>
             <button
@@ -155,7 +220,7 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
               className={`p-2 rounded ${
                 currentSlide === slides.length - 1
                   ? 'text-gray-400 cursor-not-allowed'
-                  : 'text-gray-700 hover:bg-gray-200'
+                  : 'text-current hover:bg-gray-200/20'
               }`}
               disabled={currentSlide === slides.length - 1}
             >

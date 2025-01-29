@@ -1,46 +1,79 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import { useRouter } from 'next/navigation';
+import { courseRepository } from '@/lib/supabase/client';
+import type { Database } from '@/database.types';
 
-const courses = [
-  {
-    id: 'marketing-basic',
-    title: 'マーケティング基礎講座',
-    description: 'マーケティングの基本概念や4Pの考え方、顧客分析の手法など、マーケティングの基礎を学びます。',
-    level: '初級',
-    category: 'ビジネス',
-    duration: '約4時間',
-    lessons: 12,
-  },
-  {
-    id: 'business-application',
-    title: 'ビジネス活用実践',
-    description: '業務効率化やマーケティングなど、ビジネスでの実践的な活用方法を学びます。',
-    level: '中級',
-    category: 'ビジネス',
-    duration: '約6時間',
-    lessons: 15,
-  },
-  {
-    id: 'prompt-engineering',
-    title: 'プロンプトエンジニアリング',
-    description: 'より高度な指示の出し方や、複雑なタスクの実現方法を学びます。',
-    level: '上級',
-    category: '専門',
-    duration: '約8時間',
-    lessons: 20,
-  },
-];
+type Course = Database['public']['Tables']['courses']['Row'] & {
+  category?: Database['public']['Tables']['course_categories']['Row'] | null;
+};
 
-const categories = ['すべて', '基礎', 'ビジネス', '専門', 'クリエイティブ', 'データ', '教育'];
+const categories = ['すべて', 'プログラミング基礎', 'フロントエンド開発', 'バックエンド開発'];
+const levels = ['すべて', 'beginner', 'intermediate', 'advanced'];
+
+const levelDisplayNames = {
+  beginner: '初級',
+  intermediate: '中級',
+  advanced: '上級'
+};
 
 export default function Courses() {
   const router = useRouter();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState('すべて');
+  const [selectedLevel, setSelectedLevel] = useState('すべて');
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const data = await courseRepository.getAllCourses();
+        setCourses(data as Course[]);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '課題の読み込みに失敗しました');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   const handleStartLearning = (courseId: string) => {
     router.push(`/courses/${courseId}`);
   };
+
+  const filteredCourses = courses.filter(course => {
+    const matchesCategory = selectedCategory === 'すべて' || course.category?.name === selectedCategory;
+    const matchesLevel = selectedLevel === 'すべて' || course.level === selectedLevel;
+    return matchesCategory && matchesLevel;
+  });
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-indigo-600"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="text-red-600">
+            <h2 className="text-2xl font-bold mb-2">エラーが発生しました</h2>
+            <p>{error}</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -55,9 +88,32 @@ export default function Courses() {
               {categories.map((category) => (
                 <button
                   key={category}
-                  className="px-4 py-2 rounded-full border border-gray-300 hover:border-indigo-600 hover:text-indigo-600"
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-full border ${
+                    selectedCategory === category
+                      ? 'border-indigo-600 bg-indigo-600 text-white'
+                      : 'border-gray-300 hover:border-indigo-600 hover:text-indigo-600'
+                  }`}
                 >
                   {category}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold mb-2">レベル</h2>
+            <div className="flex flex-wrap gap-2">
+              {levels.map((level) => (
+                <button
+                  key={level}
+                  onClick={() => setSelectedLevel(level)}
+                  className={`px-4 py-2 rounded-full border ${
+                    selectedLevel === level
+                      ? 'border-indigo-600 bg-indigo-600 text-white'
+                      : 'border-gray-300 hover:border-indigo-600 hover:text-indigo-600'
+                  }`}
+                >
+                  {level === 'すべて' ? level : levelDisplayNames[level as keyof typeof levelDisplayNames]}
                 </button>
               ))}
             </div>
@@ -66,7 +122,7 @@ export default function Courses() {
 
         {/* Course Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {courses.map((course) => (
+          {filteredCourses.map((course) => (
             <div
               key={course.id}
               className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow"
@@ -75,13 +131,13 @@ export default function Courses() {
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-xl font-semibold">{course.title}</h3>
                   <span className="px-2 py-1 bg-indigo-100 text-indigo-800 text-sm rounded">
-                    {course.level}
+                    {levelDisplayNames[course.level as keyof typeof levelDisplayNames]}
                   </span>
                 </div>
+                <p className="text-gray-600 mb-2">{course.subtitle}</p>
                 <p className="text-gray-600 mb-4">{course.description}</p>
                 <div className="flex items-center text-sm text-gray-500 mb-4">
-                  <span className="mr-4">🕒 {course.duration}</span>
-                  <span>📚 {course.lessons}レッスン</span>
+                  <span className="mr-4">🕒 {Math.floor(course.duration / 60)}時間 {course.duration % 60}分</span>
                 </div>
                 <button
                   onClick={() => handleStartLearning(course.id)}

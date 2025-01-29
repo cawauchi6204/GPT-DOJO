@@ -1,138 +1,56 @@
--- ユーザーテーブル
-CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    display_name VARCHAR(100) NOT NULL,
-    avatar_url VARCHAR(255),
-    role VARCHAR(20) DEFAULT 'user', -- user, admin, mentor
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+-- ユーザーのシードデータ
+INSERT INTO users (email, password_hash, display_name, role) VALUES
+('admin@example.com', '$2a$10$K.0HwpsoPDGaB/atFBmmXOGTw4ceeg33ewhqzKF.5GTb.nZJxMhQe', '管理者', 'admin'),
+('mentor@example.com', '$2a$10$K.0HwpsoPDGaB/atFBmmXOGTw4ceeg33ewhqzKF.5GTb.nZJxMhQe', 'メンター', 'mentor'),
+('user@example.com', '$2a$10$K.0HwpsoPDGaB/atFBmmXOGTw4ceeg33ewhqzKF.5GTb.nZJxMhQe', '一般ユーザー', 'user');
 
--- コースカテゴリーテーブル
-CREATE TABLE course_categories (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+-- カテゴリーのシードデータ
+INSERT INTO course_categories (id, name, description) VALUES
+('11111111-1111-1111-1111-111111111111', 'プログラミング基礎', 'プログラミングの基本的な概念を学ぶコース'),
+('22222222-2222-2222-2222-222222222222', 'フロントエンド開発', 'Webフロントエンド開発に関するコース'),
+('33333333-3333-3333-3333-333333333333', 'バックエンド開発', 'Webバックエンド開発に関するコース');
 
--- コーステーブル
-CREATE TABLE courses (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    category_id UUID REFERENCES course_categories(id),
-    title VARCHAR(255) NOT NULL,
-    subtitle VARCHAR(255),
-    description TEXT,
-    level VARCHAR(20) NOT NULL, -- beginner, intermediate, advanced
-    duration INTEGER NOT NULL, -- 分単位
-    thumbnail_url VARCHAR(255),
-    is_published BOOLEAN DEFAULT false,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+-- コースのシードデータ
+INSERT INTO courses (id, category_id, title, subtitle, description, level, duration, is_published) VALUES
+('44444444-4444-4444-4444-444444444444', '11111111-1111-1111-1111-111111111111', 'JavaScript入門', 'プログラミングの第一歩', 'JavaScriptの基本から応用まで学びます', 'beginner', 300, true),
+('55555555-5555-5555-5555-555555555555', '22222222-2222-2222-2222-222222222222', 'React基礎', 'モダンなUI開発', 'Reactの基本的な使い方を学びます', 'intermediate', 420, true),
+('66666666-6666-6666-6666-666666666666', '33333333-3333-3333-3333-333333333333', 'Node.js入門', 'サーバーサイド開発', 'Node.jsを使ったサーバー開発の基礎を学びます', 'beginner', 360, true);
 
--- レッスンテーブル
-CREATE TABLE lessons (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    course_id UUID REFERENCES courses(id),
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    content TEXT, -- レッスンの内容（Markdown形式）
-    type VARCHAR(20) NOT NULL, -- lecture, exercise
-    order_index INTEGER NOT NULL, -- レッスンの順序
-    duration INTEGER NOT NULL, -- 分単位
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+-- レッスンのシードデータ
+INSERT INTO lessons (id, course_id, title, description, content, type, order_index, duration) VALUES
+('77777777-7777-7777-7777-777777777777', '44444444-4444-4444-4444-444444444444', '変数と定数', '変数と定数の基本', '# 変数と定数\n\nJavaScriptにおける変数と定数の使い方を学びます。', 'lecture', 1, 30),
+('88888888-8888-8888-8888-888888888888', '44444444-4444-4444-4444-444444444444', '関数', '関数の基本', '# 関数\n\n関数の定義と呼び出し方を学びます。', 'lecture', 2, 45),
+('99999999-9999-9999-9999-999999999999', '44444444-4444-4444-4444-444444444444', '配列', '配列の操作', '# 配列\n\n配列の基本的な操作方法を学びます。', 'exercise', 3, 60);
 
--- スライドテーブル
-CREATE TABLE slides (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    lesson_id UUID REFERENCES lessons(id),
-    title VARCHAR(255) NOT NULL,
-    content TEXT,
-    code_example TEXT,
-    preview_content TEXT,
-    order_index INTEGER NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+-- スライドテーブルの更新
+ALTER TABLE slides
+ADD COLUMN type VARCHAR(50) NOT NULL DEFAULT 'content', -- title, content, code, image, etc
+ADD COLUMN style JSONB DEFAULT '{}', -- background_color, theme, layout, etc
+ADD COLUMN thumbnail_url VARCHAR(255),
+ADD COLUMN transition VARCHAR(50) DEFAULT 'slide'; -- slide, fade, etc
 
--- ユーザーの進捗テーブル
-CREATE TABLE user_progress (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES users(id),
-    course_id UUID REFERENCES courses(id),
-    lesson_id UUID REFERENCES lessons(id),
-    status VARCHAR(20) NOT NULL, -- not_started, in_progress, completed
-    progress_percentage INTEGER DEFAULT 0,
-    last_accessed_at TIMESTAMP WITH TIME ZONE,
-    completed_at TIMESTAMP WITH TIME ZONE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(user_id, course_id, lesson_id)
-);
+-- 既存のスライドのtypeを'content'に設定
+UPDATE slides SET type = 'content' WHERE type IS NULL;
 
--- 学習履歴テーブル
-CREATE TABLE learning_history (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES users(id),
-    course_id UUID REFERENCES courses(id),
-    lesson_id UUID REFERENCES lessons(id),
-    action_type VARCHAR(50) NOT NULL, -- started_lesson, completed_lesson, submitted_exercise
-    details JSONB, -- アクションの詳細情報
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+-- コメント追加
+COMMENT ON COLUMN slides.type IS 'スライドの種類（title: タイトル, content: 通常コンテンツ, code: コード, image: 画像等）';
+COMMENT ON COLUMN slides.style IS 'スライドのスタイル設定（背景色、テーマ、レイアウト等）';
+COMMENT ON COLUMN slides.thumbnail_url IS 'プレビュー用サムネイル画像のURL';
+COMMENT ON COLUMN slides.transition IS 'スライド遷移のアニメーション';
 
--- 演習の提出テーブル
-CREATE TABLE exercise_submissions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES users(id),
-    lesson_id UUID REFERENCES lessons(id),
-    content TEXT NOT NULL, -- 提出されたコードや回答
-    status VARCHAR(20) NOT NULL, -- pending, approved, needs_revision
-    feedback TEXT, -- メンターからのフィードバック
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+-- スライドのシードデータ
+INSERT INTO slides (lesson_id, title, content, code_example, preview_content, order_index, type, style, transition) VALUES
+('77777777-7777-7777-7777-777777777777', '変数の宣言', '変数の宣言方法について学びます。', 'let message = "Hello";', '変数を使って値を格納する方法を説明します。', 1, 'content', '{"background_color": "#f5f5f5", "theme": "light"}', 'slide'),
+('77777777-7777-7777-7777-777777777777', '定数の宣言', '定数の宣言方法について学びます。', 'const PI = 3.14;', '定数を使って変更不可能な値を定義する方法を説明します。', 2, 'code', '{"background_color": "#1e1e1e", "theme": "dark"}', 'fade'),
+('88888888-8888-8888-8888-888888888888', '関数の定義', '関数の定義方法について学びます。', 'function greet(name) {\n  return `Hello, ${name}!`;\n}', '関数を定義して処理をまとめる方法を説明します。', 1, 'content', '{"background_color": "#ffffff", "theme": "light"}', 'slide');
 
--- 達成バッジテーブル
-CREATE TABLE achievement_badges (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-    image_url VARCHAR(255),
-    criteria JSONB, -- 獲得条件
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+-- 達成バッジのシードデータ
+INSERT INTO achievement_badges (name, description, criteria) VALUES
+('初心者プログラマー', '最初のコースを完了', '{"course_completed": 1}'),
+('JavaScript マスター', 'JavaScript入門コースを完了', '{"specific_course_completed": "44444444-4444-4444-4444-444444444444"}'),
+('勤勉な学習者', '10レッスンを完了', '{"lessons_completed": 10}');
 
--- ユーザーの獲得バッジテーブル
-CREATE TABLE user_badges (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES users(id),
-    badge_id UUID REFERENCES achievement_badges(id),
-    acquired_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(user_id, badge_id)
-);
-
--- コメント・質問テーブル
-CREATE TABLE comments (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES users(id),
-    lesson_id UUID REFERENCES lessons(id),
-    parent_id UUID REFERENCES comments(id), -- 返信の場合
-    content TEXT NOT NULL,
-    is_question BOOLEAN DEFAULT false,
-    is_resolved BOOLEAN DEFAULT false,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
--- インデックス
-CREATE INDEX idx_user_progress_user_id ON user_progress(user_id);
-CREATE INDEX idx_user_progress_course_id ON user_progress(course_id);
-CREATE INDEX idx_learning_history_user_id ON learning_history(user_id);
-CREATE INDEX idx_learning_history_course_id ON learning_history(course_id);
-CREATE INDEX idx_comments_lesson_id ON comments(lesson_id);
-CREATE INDEX idx_comments_parent_id ON comments(parent_id);
+-- コメントのシードデータ
+INSERT INTO comments (user_id, lesson_id, content, is_question) VALUES
+((SELECT id FROM users WHERE email = 'user@example.com'), '77777777-7777-7777-7777-777777777777', '変数のスコープについてもう少し詳しく説明していただけますか？', true),
+((SELECT id FROM users WHERE email = 'mentor@example.com'), '77777777-7777-7777-7777-777777777777', 'グローバルスコープとローカルスコープの違いについて補足説明させていただきます。', false);
