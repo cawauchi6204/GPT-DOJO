@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import SlideModal from "@/components/course/SlideModal";
-import { lessonRepository, progressRepository } from "@/lib/supabase/client";
+import { lessonRepository } from "@/lib/supabase/client";
 import type { Database } from "@/database.types";
 
 type Lesson = Database["public"]["Tables"]["lessons"]["Row"] & {
@@ -37,19 +37,13 @@ export default function Study({
         const data = await lessonRepository.getLessonById(
           searchParams.lessonId
         );
-        setLesson(data as Lesson);
-        if (data?.course_id) {
-          // ユーザーの進捗を更新（実際の実装ではユーザーIDを使用）
-          await progressRepository.updateProgress(
-            "dummy-user-id",
-            data.course_id,
-            data.id,
-            {
-              status: "in_progress",
-              progress_percentage: 0,
-            }
+        // スライドを order_index でソート
+        if (data?.slides) {
+          data.slides = data.slides.sort(
+            (a, b) => a.order_index - b.order_index
           );
         }
+        setLesson(data as Lesson);
       } catch (err) {
         setError(
           err instanceof Error
@@ -65,7 +59,7 @@ export default function Study({
   }, [searchParams.lessonId]);
 
   const handleSubmit = async () => {
-    if (!userInput.trim() || !lesson?.course_id) return;
+    if (!userInput.trim()) return;
 
     // ユーザーの入力をメッセージリストに追加
     setMessages((prev) => [...prev, { role: "user", content: userInput }]);
@@ -80,19 +74,6 @@ export default function Study({
       ) {
         response =
           "よく書けています！STP分析の3つの要素を正しく理解できていますね。次のステップに進みましょう。";
-
-        // 進捗を更新
-        if (lesson.course_id) {
-          progressRepository.updateProgress(
-            "dummy-user-id",
-            lesson.course_id,
-            lesson.id,
-            {
-              status: "in_progress",
-              progress_percentage: 50,
-            }
-          );
-        }
       } else {
         response =
           "STP分析の3つの要素（Segmentation、Targeting、Positioning）について考えてみましょう。それぞれの要素が市場分析でどのような役割を果たすか、整理してみてください。";
@@ -197,16 +178,16 @@ export default function Study({
       </div>
 
       {/* スライドモーダル */}
-      {lesson.slides && (
+      {lesson.slides && lesson.slides.length > 0 && (
         <SlideModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           slides={lesson.slides.map((slide) => ({
             title: slide.title,
             content: slide.content || "",
-            code: slide.code_example || undefined,
-            preview: slide.preview_content || undefined,
-            isLastSlide: slide.order_index === (lesson.slides?.length || 0) - 1,
+            code: slide.code_example,
+            preview: slide.preview_content,
+            isLastSlide: false,
           }))}
         />
       )}
