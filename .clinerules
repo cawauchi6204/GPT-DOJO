@@ -10,18 +10,14 @@
   - Next.js
   - TypeScript
   - Tailwind CSS
-  - shadcn/ui
 - バックエンド
   - Supabase
 - ユニットテスト
   - Vitest
 - フォーマッター
   - Prettier
-- UI フレームワーク
-  - shadcn/ui
 
 ## 期待する回答
-
 - 実装コードは省略せず、完全な形で提供
 - TypeScript の型定義も含める
 - セキュリティのベストプラクティスに従った実装
@@ -66,7 +62,6 @@
 
 ### 3. UI/UXデザイン
 
-- shadcn/uiのコンポーネントを優先的に使用し、一貫したデザインを維持
 - 必要に応じてTailwind CSSでカスタマイズ
 - レスポンシブデザインを考慮したクラス設定
 - アクセシビリティを考慮したaria属性の付与
@@ -81,20 +76,17 @@
 ### 5. コンポーネントの種類別規約
 
 #### ボタン系
-- shadcn/uiのbuttonコンポーネントをベースに実装
 - クリックハンドラは handle[Action]Click の形式で命名
 - disabled状態の視覚的フィードバックを実装（btn-disabled）
 - loading状態の表現を統一（loading属性）
 - ボタンの種類に応じたスタイル（btn-primary, btn-ghost等）を適切に使用
 
 #### モーダル系
-- shadcn/uiのmodalコンポーネントをベースに実装
 - isVisible プロパティで表示制御
 - フォーカストラップの実装
 - キーボード操作（Escape）対応
 
 #### リスト系
-- shadcn/uiのtableコンポーネントをベースに実装
 - ページネーションの実装
 - ソート・フィルタ機能の統一的な実装
 - 空の状態の表示を統一（empty-state）

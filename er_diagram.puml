@@ -1,0 +1,148 @@
+@startuml
+
+!define table(x) class x << (T,#FFAAAA) >>
+!define primary_key(x) <u>x</u>
+!define foreign_key(x) #x#
+
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+table(users) {
+    primary_key(id): UUID
+    email: VARCHAR(255)
+    password_hash: VARCHAR(255)
+    display_name: VARCHAR(100)
+    avatar_url: VARCHAR(255)
+    role: VARCHAR(20)
+    created_at: TIMESTAMP
+    updated_at: TIMESTAMP
+}
+
+table(course_categories) {
+    primary_key(id): UUID
+    name: VARCHAR(100)
+    description: TEXT
+    created_at: TIMESTAMP
+}
+
+table(courses) {
+    primary_key(id): UUID
+    foreign_key(category_id): UUID
+    title: VARCHAR(255)
+    subtitle: VARCHAR(255)
+    description: TEXT
+    level: VARCHAR(20)
+    duration: INTEGER
+    thumbnail_url: VARCHAR(255)
+    is_published: BOOLEAN
+    created_at: TIMESTAMP
+    updated_at: TIMESTAMP
+}
+
+table(lessons) {
+    primary_key(id): UUID
+    foreign_key(course_id): UUID
+    title: VARCHAR(255)
+    description: TEXT
+    content: TEXT
+    type: VARCHAR(20)
+    order_index: INTEGER
+    duration: INTEGER
+    created_at: TIMESTAMP
+    updated_at: TIMESTAMP
+}
+
+table(slides) {
+    primary_key(id): UUID
+    foreign_key(lesson_id): UUID
+    title: VARCHAR(255)
+    content: TEXT
+    code_example: TEXT
+    preview_content: TEXT
+    order_index: INTEGER
+    created_at: TIMESTAMP
+}
+
+table(user_progress) {
+    primary_key(id): UUID
+    foreign_key(user_id): UUID
+    foreign_key(course_id): UUID
+    foreign_key(lesson_id): UUID
+    status: VARCHAR(20)
+    progress_percentage: INTEGER
+    last_accessed_at: TIMESTAMP
+    completed_at: TIMESTAMP
+    created_at: TIMESTAMP
+    updated_at: TIMESTAMP
+}
+
+table(learning_history) {
+    primary_key(id): UUID
+    foreign_key(user_id): UUID
+    foreign_key(course_id): UUID
+    foreign_key(lesson_id): UUID
+    action_type: VARCHAR(50)
+    details: JSONB
+    created_at: TIMESTAMP
+}
+
+table(exercise_submissions) {
+    primary_key(id): UUID
+    foreign_key(user_id): UUID
+    foreign_key(lesson_id): UUID
+    content: TEXT
+    status: VARCHAR(20)
+    feedback: TEXT
+    created_at: TIMESTAMP
+    updated_at: TIMESTAMP
+}
+
+table(achievement_badges) {
+    primary_key(id): UUID
+    name: VARCHAR(100)
+    description: TEXT
+    image_url: VARCHAR(255)
+    criteria: JSONB
+    created_at: TIMESTAMP
+}
+
+table(user_badges) {
+    primary_key(id): UUID
+    foreign_key(user_id): UUID
+    foreign_key(badge_id): UUID
+    acquired_at: TIMESTAMP
+}
+
+table(comments) {
+    primary_key(id): UUID
+    foreign_key(user_id): UUID
+    foreign_key(lesson_id): UUID
+    foreign_key(parent_id): UUID
+    content: TEXT
+    is_question: BOOLEAN
+    is_resolved: BOOLEAN
+    created_at: TIMESTAMP
+    updated_at: TIMESTAMP
+}
+
+course_categories ||--o{ courses
+courses ||--o{ lessons
+lessons ||--o{ slides
+users ||--o{ user_progress
+courses ||--o{ user_progress
+lessons ||--o{ user_progress
+users ||--o{ learning_history
+courses ||--o{ learning_history
+lessons ||--o{ learning_history
+users ||--o{ exercise_submissions
+lessons ||--o{ exercise_submissions
+achievement_badges ||--o{ user_badges
+users ||--o{ user_badges
+users ||--o{ comments
+lessons ||--o{ comments
+comments ||--o{ comments
+
+@enduml 
