@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation';
 
 const courses = [
   {
-    id: 'chatgpt-basic',
-    title: 'ChatGPT基礎講座',
-    description: 'ChatGPTの基本的な使い方から効果的なプロンプトの作成方法まで学びます。',
+    id: 'marketing-basic',
+    title: 'マーケティング基礎講座',
+    description: 'マーケティングの基本概念や4Pの考え方、顧客分析の手法など、マーケティングの基礎を学びます。',
     level: '初級',
-    category: '基礎',
+    category: 'ビジネス',
     duration: '約4時間',
     lessons: 12,
   },
@@ -39,8 +39,8 @@ const levels = ['すべて', '初級', '中級', '上級'];
 export default function Courses() {
   const router = useRouter();
 
-  const handleStartLearning = () => {
-    router.push('/study');
+  const handleStartLearning = (courseId: string) => {
+    router.push(`/courses/${courseId}`);
   };
 
   return (
@@ -98,7 +98,7 @@ export default function Courses() {
                   <span>📚 {course.lessons}レッスン</span>
                 </div>
                 <button
-                  onClick={handleStartLearning}
+                  onClick={() => handleStartLearning(course.id)}
                   className="block w-full text-center bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition-colors"
                 >
                   学習を始める
