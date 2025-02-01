@@ -211,7 +211,7 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
 
         {/* Slide content */}
         <div className="h-full flex flex-col">
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-hidden overflow-y-auto">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide}
