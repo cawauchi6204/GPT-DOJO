@@ -28,9 +28,9 @@ interface SlideModalProps {
 
 const transitions = {
   slide: {
-    initial: { opacity: 0, x: 100 },
+    initial: { opacity: 1, x: "100%" },
     animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -100 },
+    exit: { opacity: 1, x: "-100%" },
   },
   fade: {
     initial: { opacity: 0 },
@@ -215,15 +215,15 @@ export default function SlideModal({
         </button>
 
         {/* Slide content */}
-        <div className=" h-full flex flex-col">
-          <div className="flex-1 overflow-hidden overflow-y-auto">
+        <div className="h-full flex flex-col">
+          <div className="flex-1 overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide}
                 initial={transitions[transitionType].initial}
                 animate={transitions[transitionType].animate}
                 exit={transitions[transitionType].exit}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.1, ease: "easeInOut" }}
                 className="h-full items-start flex justify-center p-8 md:p-12"
               >
                 <div className="w-full max-w-6xl">{renderSlideContent()}</div>
