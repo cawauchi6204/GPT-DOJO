@@ -8,7 +8,7 @@ import type { Database } from "@/database.types";
 
 type Message = {
   id: string;
-  role: 'user' | 'system';
+  role: "user" | "system";
   content: string;
 };
 
@@ -17,17 +17,21 @@ type Lesson = Database["public"]["Tables"]["lessons"]["Row"] & {
   slides?: Database["public"]["Tables"]["slides"]["Row"][];
 };
 
-export default function Study({
+export default function StudyPage({
   searchParams,
 }: {
   searchParams: { lessonId?: string };
 }) {
+  return <Study lessonId={searchParams.lessonId} />;
+}
+
+function Study({ lessonId }: { lessonId?: string }) {
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -42,34 +46,33 @@ export default function Study({
   // エスケープキーでスライドを閉じる
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isModalOpen) {
+      if (e.key === "Escape" && isModalOpen) {
         setIsModalOpen(false);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isModalOpen]);
 
   useEffect(() => {
     const fetchLesson = async () => {
-      if (!searchParams.lessonId) {
+      if (!lessonId) {
         setError("レッスンIDが指定されていません");
         setIsLoading(false);
         return;
       }
 
       try {
-        const data = await lessonRepository.getLessonById(
-          searchParams.lessonId
-        );
-        console.log("🚀 ~ fetchLesson ~ data:", data)
+        const data = await lessonRepository.getLessonById(lessonId);
+        console.log("🚀 ~ fetchLesson ~ data:", data);
         // スライドを order_index でソート
         if (data?.slides) {
           data.slides = data.slides.sort(
-            (a: Database["public"]["Tables"]["slides"]["Row"], 
-             b: Database["public"]["Tables"]["slides"]["Row"]) => 
-              a.order_index - b.order_index
+            (
+              a: Database["public"]["Tables"]["slides"]["Row"],
+              b: Database["public"]["Tables"]["slides"]["Row"]
+            ) => a.order_index - b.order_index
           );
         }
         setLesson(data as Lesson);
@@ -85,7 +88,7 @@ export default function Study({
     };
 
     fetchLesson();
-  }, [searchParams.lessonId]);
+  }, [lessonId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,19 +96,19 @@ export default function Study({
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      role: 'user',
+      role: "user",
       content: input,
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
     setIsStreaming(true);
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
+      const response = await fetch("/api/chat", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           messages: messages.concat(userMessage).map(({ role, content }) => ({
@@ -115,18 +118,21 @@ export default function Study({
         }),
       });
 
-      if (!response.ok) throw new Error('API request failed');
-      if (!response.body) throw new Error('Response body is null');
+      if (!response.ok) throw new Error("API request failed");
+      if (!response.body) throw new Error("Response body is null");
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
 
       const assistantMessageId = Date.now().toString();
-      setMessages(prev => [...prev, {
-        id: assistantMessageId,
-        role: 'system',
-        content: '',
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: assistantMessageId,
+          role: "system",
+          content: "",
+        },
+      ]);
 
       try {
         while (true) {
@@ -134,23 +140,28 @@ export default function Study({
           if (done) break;
 
           const text = decoder.decode(value);
-          setMessages(prev => prev.map(msg => 
-            msg.id === assistantMessageId
-              ? { ...msg, content: msg.content + text }
-              : msg
-          ));
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessageId
+                ? { ...msg, content: msg.content + text }
+                : msg
+            )
+          );
           scrollToBottom();
         }
       } finally {
         reader.releaseLock();
       }
     } catch (error) {
-      console.error('Error:', error);
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        role: 'system',
-        content: 'エラーが発生しました。もう一度お試しください。',
-      }]);
+      console.error("Error:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          role: "system",
+          content: "エラーが発生しました。もう一度お試しください。",
+        },
+      ]);
     } finally {
       setIsStreaming(false);
     }
@@ -186,7 +197,9 @@ export default function Study({
         <div className="w-full md:w-[30%] lg:w-[20%] bg-gray-50 flex flex-col">
           <div className="flex-1 p-4 md:p-6 overflow-hidden">
             <div className="max-w-2xl mx-auto">
-              <h1 className="text-xl md:text-2xl font-bold mb-4">{lesson.title}</h1>
+              <h1 className="text-xl md:text-2xl font-bold mb-4">
+                {lesson.title}
+              </h1>
               <div className="prose prose-sm md:prose">
                 <p className="mb-4">{lesson.description}</p>
                 <div className="mt-6 md:mt-8 p-3 md:p-4 bg-gray-100 rounded-lg">
@@ -198,7 +211,7 @@ export default function Study({
               </div>
             </div>
           </div>
-          
+
           {/* スライドを見るボタン */}
           {lesson.slides && lesson.slides.length > 0 && (
             <button
@@ -206,8 +219,17 @@ export default function Study({
               className="h-[50px] w-full bg-[#19c37d] text-white hover:bg-[#1a8870] transition-colors flex items-center justify-center gap-2 text-sm md:text-base"
             >
               スライドを見る
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 md:h-5 md:w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                  clipRule="evenodd"
+                />
               </svg>
             </button>
           )}
@@ -226,25 +248,33 @@ export default function Study({
                   }`}
                 >
                   {/* アイコン */}
-                  <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    message.role === "system" ? "bg-[#19c37d]" : "bg-blue-500"
-                  }`}>
+                  <div
+                    className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      message.role === "system" ? "bg-[#19c37d]" : "bg-blue-500"
+                    }`}
+                  >
                     <span className="text-sm md:text-base">
                       {message.role === "system" ? "AI" : "U"}
                     </span>
                   </div>
-                  
+
                   {/* メッセージ */}
-                  <div className={`max-w-[80%] ${
-                    message.role === "user" ? "bg-blue-500" : "bg-[#2a2a2a]"
-                  } rounded-2xl px-3 md:px-4 py-2 text-white relative`}>
+                  <div
+                    className={`max-w-[80%] ${
+                      message.role === "user" ? "bg-blue-500" : "bg-[#2a2a2a]"
+                    } rounded-2xl px-3 md:px-4 py-2 text-white relative`}
+                  >
                     {/* 吹き出しの三角形 */}
-                    <div className={`absolute top-3 w-2 h-2 transform rotate-45 ${
-                      message.role === "user" 
-                        ? "right-[-4px] bg-blue-500" 
-                        : "left-[-4px] bg-[#2a2a2a]"
-                    }`}></div>
-                    <div className="whitespace-pre-wrap text-sm md:text-base">{message.content}</div>
+                    <div
+                      className={`absolute top-3 w-2 h-2 transform rotate-45 ${
+                        message.role === "user"
+                          ? "right-[-4px] bg-blue-500"
+                          : "left-[-4px] bg-[#2a2a2a]"
+                      }`}
+                    ></div>
+                    <div className="whitespace-pre-wrap text-sm md:text-base">
+                      {message.content}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -254,7 +284,10 @@ export default function Study({
 
           {/* 入力エリア */}
           <div className="border-t border-gray-800 bg-[#1a1a1a] p-3 md:p-4">
-            <form onSubmit={handleSubmit} className="max-w-3xl mx-auto relative">
+            <form
+              onSubmit={handleSubmit}
+              className="max-w-3xl mx-auto relative"
+            >
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -285,9 +318,7 @@ export default function Study({
                   width="1em"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path
-                    d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"
-                  ></path>
+                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
                 </svg>
               </button>
             </form>
