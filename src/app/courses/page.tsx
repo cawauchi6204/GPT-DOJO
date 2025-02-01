@@ -29,10 +29,6 @@ export default function Courses() {
     fetchCourses();
   }, []);
 
-  const formatPrice = (price: number) => {
-    return price === 0 ? "無料" : `¥${price.toLocaleString()}`;
-  };
-
   if (isLoading) {
     return (
       <Layout>
@@ -83,9 +79,6 @@ export default function Courses() {
               <div className="flex items-center justify-between">
                 <span className="text-sm md:text-base text-gray-500">
                   {course.lesson_count}レッスン
-                </span>
-                <span className="text-sm md:text-base text-[#19c37d] font-medium">
-                  {formatPrice(course.price)}
                 </span>
               </div>
             </Link>

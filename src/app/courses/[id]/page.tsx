@@ -72,12 +72,6 @@ export default function Course({ params }: CoursePageProps) {
     );
   }
 
-  const formatPrice = (price: number | null | undefined) => {
-    if (price === null || price === undefined) return "無料";
-    if (price === 0) return "無料";
-    return `¥${price.toLocaleString()}`;
-  };
-
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-12">
@@ -89,9 +83,6 @@ export default function Course({ params }: CoursePageProps) {
           <div className="flex flex-wrap gap-4 text-sm md:text-base">
             <div className="bg-gray-100 px-3 py-1 rounded-full">
               {lessons.length}レッスン
-            </div>
-            <div className="bg-[#19c37d] text-white px-3 py-1 rounded-full">
-              {formatPrice(course.price)}
             </div>
           </div>
         </div>
