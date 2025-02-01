@@ -20,7 +20,9 @@ export default function Courses() {
         const data = await courseRepository.getAllCourses();
         setCourses(data || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "コースの読み込みに失敗しました");
+        setError(
+          err instanceof Error ? err.message : "コースの読み込みに失敗しました"
+        );
       } finally {
         setIsLoading(false);
       }
@@ -55,8 +57,10 @@ export default function Courses() {
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-12">
-        <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">コース一覧</h1>
-        
+        <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">
+          コース一覧
+        </h1>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {courses.map((course) => (
             <Link
@@ -72,7 +76,9 @@ export default function Courses() {
                   className="object-cover rounded-lg"
                 />
               </div>
-              <h2 className="text-lg md:text-xl font-semibold mb-2">{course.title}</h2>
+              <h2 className="text-lg md:text-xl font-semibold mb-2">
+                {course.title}
+              </h2>
               <p className="text-sm md:text-base text-gray-600 mb-4">
                 {course.description}
               </p>
@@ -87,7 +93,9 @@ export default function Courses() {
           {courses.length === 0 && (
             <div className="bg-white rounded-lg shadow-md p-4 md:p-6 opacity-50">
               <div className="aspect-video bg-gray-100 rounded-lg mb-4"></div>
-              <h2 className="text-lg md:text-xl font-semibold mb-2">コースがありません</h2>
+              <h2 className="text-lg md:text-xl font-semibold mb-2">
+                コースがありません
+              </h2>
               <p className="text-sm md:text-base text-gray-600 mb-4">
                 新しいコースを準備中です。お楽しみに!
               </p>
