@@ -181,19 +181,34 @@ export default function Study({
     <Layout hideFooter={true}>
       <div className="flex h-[calc(100vh-64px)] relative">
         {/* 左側:説明エリア */}
-        <div className="w-[20%] bg-gray-50 p-6 overflow-hidden">
-          <div className="max-w-2xl mx-auto">
-            <h1 className="text-2xl font-bold mb-4">{lesson.title}</h1>
-            <div className="prose">
-              <p className="mb-4">{lesson.description}</p>
-              <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-                <h2 className="font-semibold mb-2">見本</h2>
-                <code className="block bg-white p-3 rounded">
-                  {lesson.content}
-                </code>
+        <div className="w-[20%] bg-gray-50 flex flex-col">
+          <div className="flex-1 p-6 overflow-hidden">
+            <div className="max-w-2xl mx-auto">
+              <h1 className="text-2xl font-bold mb-4">{lesson.title}</h1>
+              <div className="prose">
+                <p className="mb-4">{lesson.description}</p>
+                <div className="mt-8 p-4 bg-gray-100 rounded-lg">
+                  <h2 className="font-semibold mb-2">見本</h2>
+                  <code className="block bg-white p-3 rounded">
+                    {lesson.content}
+                  </code>
+                </div>
               </div>
             </div>
           </div>
+          
+          {/* スライドを見るボタン */}
+          {lesson.slides && lesson.slides.length > 0 && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="h-[50px] w-full bg-[#19c37d] text-white hover:bg-[#1a8870] transition-colors flex items-center justify-center gap-2"
+            >
+              スライドを見る
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* 右側:ChatGPTスタイルのインターフェース */}
@@ -277,19 +292,6 @@ export default function Study({
             </div>
           </div>
         </div>
-
-        {/* スライドを見るボタン */}
-        {lesson.slides && lesson.slides.length > 0 && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-[#19c37d] text-white px-6 py-2 rounded-full shadow-lg hover:bg-[#1a8870] transition-colors flex items-center gap-2"
-          >
-            スライドを見る
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-            </svg>
-          </button>
-        )}
       </div>
 
       {/* スライドモーダル */}
