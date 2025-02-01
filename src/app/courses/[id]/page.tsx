@@ -1,44 +1,53 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Layout from '@/components/layout/Layout';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { courseRepository } from '@/lib/supabase/client';
-import type { Database } from '@/database.types';
+import { useState, useEffect } from "react";
+import Layout from "@/components/layout/Layout";
+import Link from "next/link";
+import { courseRepository, lessonRepository } from "@/lib/supabase/client";
+import type { Database } from "@/database.types";
 
-type Course = Database['public']['Tables']['courses']['Row'] & {
-  category?: Database['public']['Tables']['course_categories']['Row'] | null;
-  lessons?: (Database['public']['Tables']['lessons']['Row'] & {
-    slides?: Database['public']['Tables']['slides']['Row'][];
-  })[];
-};
+type Course = Database["public"]["Tables"]["courses"]["Row"];
+type Lesson = Database["public"]["Tables"]["lessons"]["Row"];
 
-export default function CourseDetail({ params }: { params: { id: string } }) {
-  const router = useRouter();
+interface CoursePageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function Course({ params }: CoursePageProps) {
   const [course, setCourse] = useState<Course | null>(null);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCourseDetails = async () => {
+    const fetchCourseAndLessons = async () => {
       try {
-        const data = await courseRepository.getCourseById(params.id);
-        setCourse(data as Course);
+        // コース情報を取得
+        const courseData = await courseRepository.getCourseById(params.id);
+        if (!courseData) {
+          setError("コースが見つかりません");
+          return;
+        }
+        setCourse(courseData);
+
+        // レッスン一覧を取得
+        const lessonsData = await lessonRepository.getLessonsByCourseId(params.id);
+        if (lessonsData) {
+          // order_indexでソート
+          const sortedLessons = lessonsData.sort((a, b) => a.order_index - b.order_index);
+          setLessons(sortedLessons);
+        }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'コースの読み込みに失敗しました');
+        setError(err instanceof Error ? err.message : "データの読み込みに失敗しました");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchCourseDetails();
+    fetchCourseAndLessons();
   }, [params.id]);
-
-  const handleStartLesson = (lessonId: string) => {
-    if (!lessonId) return;
-    router.push(`/study?lessonId=${lessonId}`);
-  };
 
   if (isLoading) {
     return (
@@ -56,103 +65,73 @@ export default function CourseDetail({ params }: { params: { id: string } }) {
         <div className="flex justify-center items-center min-h-screen">
           <div className="text-red-600">
             <h2 className="text-2xl font-bold mb-2">エラーが発生しました</h2>
-            <p>{error || 'コースが見つかりません'}</p>
+            <p>{error || "コースが見つかりません"}</p>
           </div>
         </div>
       </Layout>
     );
   }
 
-  // レッスンを順序で並び替え
-  const sortedLessons = course.lessons 
-    ? [...course.lessons].sort((a, b) => a.order_index - b.order_index)
-    : [];
+  const formatPrice = (price: number | null | undefined) => {
+    if (price === null || price === undefined) return "無料";
+    if (price === 0) return "無料";
+    return `¥${price.toLocaleString()}`;
+  };
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* コースヘッダー */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-2">{course.title}</h1>
-          <p className="text-xl text-gray-600">{course.subtitle}</p>
-        </div>
-
-        {/* レッスン一覧 */}
-        <div className="space-y-8">
-          {sortedLessons.map((lesson) => (
-            <div key={lesson.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="flex">
-                {/* 左側：アイコンと進捗 */}
-                <div className="w-64 bg-[#e6f7f5] p-8 flex flex-col items-center justify-center">
-                  <div className="relative w-32 h-32 mb-4">
-                    <div className="w-full h-full rounded-full border-4 border-[#4bc3c3] flex items-center justify-center">
-                      <Image
-                        src="/images/lesson-icon.png"
-                        alt="Lesson icon"
-                        width={80}
-                        height={80}
-                        className="opacity-50"
-                      />
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-gray-500">0%</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 右側：レッスン情報 */}
-                <div className="flex-1 p-8">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <span className={`inline-block px-3 py-1 rounded-full text-sm ${
-                        lesson.type === 'exercise'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-[#e6f7f5] text-[#4bc3c3]'
-                      } mb-2`}>
-                        {lesson.type === 'exercise' ? '道場レッスン' : '学習レッスン'}
-                      </span>
-                      <h2 className="text-2xl font-bold">{lesson.title}</h2>
-                    </div>
-                    <div className="flex items-center text-gray-500">
-                      <span className="mr-2">🕒</span>
-                      <span>{lesson.duration}分</span>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 mb-6">{lesson.description}</p>
-                  <div className="flex justify-between items-center">
-                    <button
-                      onClick={() => handleStartLesson(lesson.id)}
-                      className="bg-[#4bc3c3] text-white px-6 py-2 rounded hover:bg-[#3da3a3] transition-colors"
-                    >
-                      レッスンを始める
-                    </button>
-                    <button className="text-gray-500 hover:text-gray-700">
-                      レッスン詳細へ →
-                    </button>
-                  </div>
-                </div>
-              </div>
+      <div className="max-w-7xl mx-auto px-4 py-6 md:py-12">
+        <div className="mb-6 md:mb-12">
+          <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">{course.title}</h1>
+          <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-8">
+            {course.description}
+          </p>
+          <div className="flex flex-wrap gap-4 text-sm md:text-base">
+            <div className="bg-gray-100 px-3 py-1 rounded-full">
+              {lessons.length}レッスン
             </div>
-          ))}
-        </div>
-
-        {/* チャレンジセクション */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6">チャレンジしてみよう！</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* チャレンジカード */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-2">道場レッスン</h3>
-                <p className="text-gray-600 mb-4">
-                  学んだ内容を活かして、実践的な課題に挑戦してみましょう。
-                </p>
-                <button className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 transition-colors">
-                  チャレンジする
-                </button>
-              </div>
+            <div className="bg-[#19c37d] text-white px-3 py-1 rounded-full">
+              {formatPrice(course.price)}
             </div>
           </div>
+        </div>
+
+        <div className="space-y-4 md:space-y-6">
+          {/* レッスンリスト */}
+          {lessons.map((lesson, index) => (
+            <div key={lesson.id} className="bg-white rounded-lg shadow-md p-4 md:p-6">
+              <Link
+                href={`/study?lessonId=${lesson.id}`}
+                className="flex items-start gap-4 hover:bg-gray-50 -m-4 md:-m-6 p-4 md:p-6 transition-colors"
+              >
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-[#19c37d] text-white rounded-full flex items-center justify-center flex-shrink-0">
+                  {index + 1}
+                </div>
+                <div>
+                  <h3 className="text-lg md:text-xl font-semibold mb-2">{lesson.title}</h3>
+                  <p className="text-sm md:text-base text-gray-600">
+                    {lesson.description}
+                  </p>
+                </div>
+              </Link>
+            </div>
+          ))}
+
+          {lessons.length === 0 && (
+            <div className="bg-white rounded-lg shadow-md p-4 md:p-6 opacity-50">
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-400 text-white rounded-full flex items-center justify-center flex-shrink-0">
+                  1
+                </div>
+                <div>
+                  <h3 className="text-lg md:text-xl font-semibold mb-2">レッスンがありません</h3>
+                  <p className="text-sm md:text-base text-gray-600">
+                    新しいレッスンを準備中です。お楽しみに!
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </Layout>

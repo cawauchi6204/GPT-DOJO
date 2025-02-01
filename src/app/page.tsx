@@ -1,160 +1,152 @@
-import Layout from '@/components/layout/Layout';
-import Link from 'next/link';
+"use client";
+
+import { useState, useEffect } from "react";
+import Layout from "@/components/layout/Layout";
+import Link from "next/link";
+import { courseRepository } from "@/lib/supabase/client";
+import type { Database } from "@/database.types";
+
+type Course = Database["public"]["Tables"]["courses"]["Row"];
 
 export default function Home() {
+  const [featuredCourses, setFeaturedCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchFeaturedCourses = async () => {
+      try {
+        const data = await courseRepository.getFeaturedCourses();
+        setFeaturedCourses(data || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "データの読み込みに失敗しました");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchFeaturedCourses();
+  }, []);
+
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* ヒーローセクション */}
+        <div className="py-12 md:py-20">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              AI時代のスキルを最速で学ぼう！
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
+              ChatGPTを楽しく学ぼう
             </h1>
-            <p className="text-xl md:text-2xl mb-8">
-              ChatGPTを使いこなして、仕事と生活を変える
+            <p className="text-lg md:text-xl text-gray-600 mb-8 md:mb-12 max-w-2xl mx-auto">
+              GPT Dojoは、ChatGPTの使い方を楽しく学べるオンライン学習プラットフォームです。
+              初心者から上級者まで、ステップバイステップで学習できます。
             </p>
             <Link
-              href="/signup"
-              className="bg-white text-indigo-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-colors"
+              href="/courses"
+              className="inline-block bg-[#19c37d] text-white px-6 md:px-8 py-3 md:py-4 rounded-full text-lg md:text-xl font-semibold hover:bg-[#1a8870] transition-colors"
             >
-              無料で始める
+              コースを見る
             </Link>
           </div>
         </div>
-      </section>
 
-      {/* Features Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">
+        {/* おすすめコース */}
+        {!isLoading && !error && featuredCourses.length > 0 && (
+          <div className="py-12 md:py-20">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
+              おすすめのコース
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+              {featuredCourses.map((course) => (
+                <Link
+                  key={course.id}
+                  href={`/courses/${course.id}`}
+                  className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 md:p-6"
+                >
+                  <div className="aspect-video bg-gray-100 rounded-lg mb-4">
+                    <img
+                      src={course.thumbnail_url || "/images/lesson-icon.png"}
+                      alt={`${course.title}のサムネイル`}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
+                  <p className="text-gray-600 mb-4">{course.description}</p>
+                  <div className="text-[#19c37d] font-medium">
+                    今すぐ始める →
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 特徴セクション */}
+        <div className="py-12 md:py-20">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
             GPT Dojoの特徴
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-4">
-                分かりやすいカリキュラム
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-[#19c37d] text-white rounded-full flex items-center justify-center mb-4 mx-auto">
+                <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <h3 className="text-xl md:text-2xl font-semibold text-center mb-2">
+                ステップバイステップ
               </h3>
-              <p className="text-gray-600">
-                初心者から上級者まで、段階的に学べる充実したコンテンツを提供します。
+              <p className="text-gray-600 text-center">
+                初心者でも分かりやすく、順を追って学習できます。
               </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-4">
-                実践的な演習
+
+            <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-[#19c37d] text-white rounded-full flex items-center justify-center mb-4 mx-auto">
+                <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                </svg>
+              </div>
+              <h3 className="text-xl md:text-2xl font-semibold text-center mb-2">
+                インタラクティブ
               </h3>
-              <p className="text-gray-600">
-                実際のビジネスシーンを想定した課題で、実践的なスキルが身につきます。
+              <p className="text-gray-600 text-center">
+                実践的な演習で、実際に使いながら学べます。
               </p>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-4">
-                充実したサポート
+
+            <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-[#19c37d] text-white rounded-full flex items-center justify-center mb-4 mx-auto">
+                <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl md:text-2xl font-semibold text-center mb-2">
+                コミュニティ
               </h3>
-              <p className="text-gray-600">
-                コミュニティやメンターによるサポートで、確実に成長をサポートします。
+              <p className="text-gray-600 text-center">
+                他の学習者と交流しながら、知識を深められます。
               </p>
             </div>
           </div>
         </div>
-      </section>
 
-      {/* Courses Preview Section */}
-      <section className="bg-gray-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            人気のコース
+        {/* CTAセクション */}
+        <div className="py-12 md:py-20 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">
+            さあ、始めましょう
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">
-                  ChatGPT基礎講座
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  ChatGPTの基本的な使い方から効果的なプロンプトの作成方法まで学びます。
-                </p>
-                <Link
-                  href="/courses/chatgpt-basic"
-                  className="text-indigo-600 hover:text-indigo-800"
-                >
-                  コースの詳細を見る →
-                </Link>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">
-                  ビジネス活用実践
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  業務効率化やマーケティングなど、ビジネスでの実践的な活用方法を学びます。
-                </p>
-                <Link
-                  href="/courses/business-application"
-                  className="text-indigo-600 hover:text-indigo-800"
-                >
-                  コースの詳細を見る →
-                </Link>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">
-                  プロンプトエンジニアリング
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  より高度な指示の出し方や、複雑なタスクの実現方法を学びます。
-                </p>
-                <Link
-                  href="/courses/prompt-engineering"
-                  className="text-indigo-600 hover:text-indigo-800"
-                >
-                  コースの詳細を見る →
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            受講者の声
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <p className="text-gray-600 mb-4">
-                「初めてAIを学ぶ人でも分かりやすく、実践的なスキルが身につきました。仕事での活用方法が具体的に理解できて良かったです。」
-              </p>
-              <p className="font-semibold">田中さん（会社員）</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <p className="text-gray-600 mb-4">
-                「コミュニティでの情報共有が活発で、他の受講生の活用事例からも多くの学びがありました。メンターのサポートも親切で助かりました。」
-              </p>
-              <p className="font-semibold">鈴木さん（フリーランス）</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="bg-indigo-600 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-8">
-            今すぐ学習を始めましょう！
-          </h2>
+          <p className="text-lg md:text-xl text-gray-600 mb-8 md:mb-12 max-w-2xl mx-auto">
+            無料のコースから、ChatGPTの学習を始めることができます。
+          </p>
           <Link
-            href="/signup"
-            className="bg-white text-indigo-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-colors"
+            href="/courses"
+            className="inline-block bg-[#19c37d] text-white px-6 md:px-8 py-3 md:py-4 rounded-full text-lg md:text-xl font-semibold hover:bg-[#1a8870] transition-colors"
           >
-            無料で始める
+            コースを見る
           </Link>
         </div>
-      </section>
+      </div>
     </Layout>
   );
 }

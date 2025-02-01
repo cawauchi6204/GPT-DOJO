@@ -1,133 +1,132 @@
-import Layout from '@/components/layout/Layout';
-import Link from 'next/link';
+"use client";
+
+import { useState, useEffect } from "react";
+import Layout from "@/components/layout/Layout";
+import Link from "next/link";
+import { courseRepository } from "@/lib/supabase/client";
+import type { Database } from "@/database.types";
+
+type Course = Database["public"]["Tables"]["courses"]["Row"];
 
 export default function Dashboard() {
-  // ダミーデータ
-  const currentCourses = [
-    {
-      id: 'chatgpt-basic',
-      title: 'ChatGPT基礎講座',
-      progress: 60,
-      nextLesson: 'プロンプトの基本構造',
-    },
-    {
-      id: 'business-application',
-      title: 'ビジネス活用実践',
-      progress: 30,
-      nextLesson: 'マーケティングでの活用',
-    },
-  ];
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const recommendedCourses = [
-    {
-      id: 'prompt-engineering',
-      title: 'プロンプトエンジニアリング',
-      description: 'より高度な指示の出し方を学ぶ',
-    },
-    {
-      id: 'creative-writing',
-      title: 'クリエイティブライティング',
-      description: 'AIを活用した文章作成テクニック',
-    },
-  ];
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const data = await courseRepository.getEnrolledCourses();
+        setCourses(data || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "データの読み込みに失敗しました");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const achievements = [
-    {
-      id: 1,
-      title: '基礎コース修了',
-      date: '2024/01/15',
-      badge: '🎓',
-    },
-    {
-      id: 2,
-      title: '課題を10個達成',
-      date: '2024/01/20',
-      badge: '🏆',
-    },
-  ];
+    fetchCourses();
+  }, []);
+
+  const formatPrice = (price: number | null | undefined) => {
+    if (price === null || price === undefined) return "無料";
+    if (price === 0) return "無料";
+    return `¥${price.toLocaleString()}`;
+  };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-indigo-600"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="text-red-600">
+            <h2 className="text-2xl font-bold mb-2">エラーが発生しました</h2>
+            <p>{error}</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">マイダッシュボード</h1>
-          <Link
-            href="/courses"
-            className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-          >
-            新しいコースを探す
-          </Link>
-        </div>
-
-        {/* 学習進捗セクション */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-4">学習中のコース</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {currentCourses.map((course) => (
-              <div key={course.id} className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
-                <div className="mb-4">
-                  <div className="flex justify-between text-sm text-gray-600 mb-1">
-                    <span>進捗状況</span>
-                    <span>{course.progress}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-indigo-600 h-2 rounded-full"
-                      style={{ width: `${course.progress}%` }}
+      <div className="max-w-7xl mx-auto px-4 py-6 md:py-12">
+        <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">マイダッシュボード</h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {/* 進行中のコース */}
+          {courses.map((course) => (
+            <div key={course.id} className="bg-white rounded-lg shadow-md p-4 md:p-6">
+              <h2 className="text-lg md:text-xl font-semibold mb-4">進行中のコース</h2>
+              <Link
+                href={`/courses/${course.id}`}
+                className="block hover:bg-gray-50 -m-4 md:-m-6 p-4 md:p-6 transition-colors"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-lg flex-shrink-0">
+                    <img
+                      src={course.thumbnail_url || "/images/lesson-icon.png"}
+                      alt="コースサムネイル"
+                      className="w-full h-full object-cover rounded-lg"
                     />
                   </div>
-                </div>
-                <p className="text-gray-600 mb-4">
-                  次のレッスン: {course.nextLesson}
-                </p>
-                <Link
-                  href={`/courses/${course.id}`}
-                  className="text-indigo-600 hover:text-indigo-800"
-                >
-                  続きから学習する →
-                </Link>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* おすすめコースセクション */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-4">おすすめのコース</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {recommendedCourses.map((course) => (
-              <div key={course.id} className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
-                <p className="text-gray-600 mb-4">{course.description}</p>
-                <Link
-                  href={`/courses/${course.id}`}
-                  className="text-indigo-600 hover:text-indigo-800"
-                >
-                  コースの詳細を見る →
-                </Link>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* 実績セクション */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">最近の実績</h2>
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="divide-y divide-gray-200">
-              {achievements.map((achievement) => (
-                <div key={achievement.id} className="p-4 flex items-center">
-                  <span className="text-2xl mr-4">{achievement.badge}</span>
                   <div>
-                    <h3 className="font-semibold">{achievement.title}</h3>
-                    <p className="text-sm text-gray-600">{achievement.date}</p>
+                    <h3 className="font-medium mb-1">{course.title}</h3>
+                    <div className="text-sm md:text-base text-gray-600">
+                      <div className="mb-2">進捗率: 10%</div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-[#19c37d] h-2 rounded-full" style={{ width: '10%' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          ))}
+
+          {/* 最近の活動 */}
+          <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+            <h2 className="text-lg md:text-xl font-semibold mb-4">最近の活動</h2>
+            <div className="space-y-3 md:space-y-4">
+              {courses.map((course) => (
+                <div key={course.id} className="flex items-center gap-3">
+                  <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="font-medium">{course.title}を開始</div>
+                    <div className="text-sm text-gray-500">2時間前</div>
                   </div>
                 </div>
               ))}
+
+              {courses.length === 0 && (
+                <div className="text-sm md:text-base text-gray-600">
+                  まだ活動履歴がありません
+                </div>
+              )}
             </div>
           </div>
-        </section>
+
+          {/* おすすめのコース */}
+          <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+            <h2 className="text-lg md:text-xl font-semibold mb-4">おすすめのコース</h2>
+            <div className="text-sm md:text-base text-gray-600">
+              新しいコースを準備中です。お楽しみに!
+            </div>
+          </div>
+        </div>
       </div>
     </Layout>
   );
