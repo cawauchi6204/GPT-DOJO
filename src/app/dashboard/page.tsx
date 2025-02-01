@@ -5,6 +5,7 @@ import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { courseRepository } from "@/lib/supabase/client";
 import type { Database } from "@/database.types";
+import Image from "next/image";
 
 type Course = Database["public"]["Tables"]["courses"]["Row"];
 
@@ -27,12 +28,6 @@ export default function Dashboard() {
 
     fetchCourses();
   }, []);
-
-  const formatPrice = (price: number | null | undefined) => {
-    if (price === null || price === undefined) return "無料";
-    if (price === 0) return "無料";
-    return `¥${price.toLocaleString()}`;
-  };
 
   if (isLoading) {
     return (
@@ -72,11 +67,12 @@ export default function Dashboard() {
                 className="block hover:bg-gray-50 -m-4 md:-m-6 p-4 md:p-6 transition-colors"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-lg flex-shrink-0">
-                    <img
+                  <div className="relative w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-lg flex-shrink-0">
+                    <Image
                       src={course.thumbnail_url || "/images/lesson-icon.png"}
                       alt="コースサムネイル"
-                      className="w-full h-full object-cover rounded-lg"
+                      fill
+                      className="object-cover rounded-lg"
                     />
                   </div>
                   <div>

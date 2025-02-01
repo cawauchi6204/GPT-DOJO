@@ -5,6 +5,7 @@ import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { courseRepository } from "@/lib/supabase/client";
 import type { Database } from "@/database.types";
+import Image from "next/image";
 
 type Course = Database["public"]["Tables"]["courses"]["Row"];
 
@@ -63,11 +64,12 @@ export default function Home() {
                   href={`/courses/${course.id}`}
                   className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 md:p-6"
                 >
-                  <div className="aspect-video bg-gray-100 rounded-lg mb-4">
-                    <img
+                  <div className="aspect-video bg-gray-100 rounded-lg mb-4 relative">
+                    <Image
                       src={course.thumbnail_url || "/images/lesson-icon.png"}
                       alt={`${course.title}のサムネイル`}
-                      className="w-full h-full object-cover rounded-lg"
+                      fill
+                      className="object-cover rounded-lg"
                     />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">{course.title}</h3>

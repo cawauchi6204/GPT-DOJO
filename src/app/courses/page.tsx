@@ -5,6 +5,7 @@ import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { courseRepository } from "@/lib/supabase/client";
 import type { Database } from "@/database.types";
+import Image from "next/image";
 
 type Course = Database["public"]["Tables"]["courses"]["Row"];
 
@@ -28,10 +29,8 @@ export default function Courses() {
     fetchCourses();
   }, []);
 
-  const formatPrice = (price: number | null | undefined) => {
-    if (price === null || price === undefined) return "無料";
-    if (price === 0) return "無料";
-    return `¥${price.toLocaleString()}`;
+  const formatPrice = (price: number) => {
+    return price === 0 ? "無料" : `¥${price.toLocaleString()}`;
   };
 
   if (isLoading) {
@@ -69,11 +68,12 @@ export default function Courses() {
               href={`/courses/${course.id}`}
               className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 md:p-6"
             >
-              <div className="aspect-video bg-gray-100 rounded-lg mb-4">
-                <img
+              <div className="aspect-video bg-gray-100 rounded-lg mb-4 relative">
+                <Image
                   src={course.thumbnail_url || "/images/lesson-icon.png"}
                   alt={`${course.title}のサムネイル`}
-                  className="w-full h-full object-cover rounded-lg"
+                  fill
+                  className="object-cover rounded-lg"
                 />
               </div>
               <h2 className="text-lg md:text-xl font-semibold mb-2">{course.title}</h2>
@@ -82,7 +82,7 @@ export default function Courses() {
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-sm md:text-base text-gray-500">
-                  {course.lesson_count || 0}レッスン
+                  {course.lesson_count}レッスン
                 </span>
                 <span className="text-sm md:text-base text-[#19c37d] font-medium">
                   {formatPrice(course.price)}
