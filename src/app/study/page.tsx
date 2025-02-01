@@ -37,6 +37,7 @@ export default function Study({
         const data = await lessonRepository.getLessonById(
           searchParams.lessonId
         );
+        console.log("🚀 ~ fetchLesson ~ data:", data)
         // スライドを order_index でソート
         if (data?.slides) {
           data.slides = data.slides.sort(
@@ -185,8 +186,8 @@ export default function Study({
           slides={lesson.slides.map((slide) => ({
             title: slide.title,
             content: slide.content || "",
-            code: slide.code_example,
-            preview: slide.preview_content,
+            code: slide.code_example || undefined,
+            preview: slide.preview_content || undefined,
             isLastSlide: false,
           }))}
         />
