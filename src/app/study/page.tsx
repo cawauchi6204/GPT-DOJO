@@ -28,13 +28,13 @@ export default function Study({
   // エスケープキーでスライドを閉じる
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isModalOpen) {
+      if (e.key === "Escape" && isModalOpen) {
         setIsModalOpen(false);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isModalOpen]);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function Study({
         const data = await lessonRepository.getLessonById(
           searchParams.lessonId
         );
-        console.log("🚀 ~ fetchLesson ~ data:", data)
+        console.log("🚀 ~ fetchLesson ~ data:", data);
         // スライドを order_index でソート
         if (data?.slides) {
           data.slides = data.slides.sort(
@@ -130,7 +130,7 @@ export default function Study({
     <Layout hideFooter={true}>
       <div className="flex h-[calc(100vh-64px)] relative">
         {/* 左側:説明エリア */}
-        <div className="w-1/2 bg-gray-50 p-6 overflow-hidden">
+        <div className="w-[20%] bg-gray-50 p-6 overflow-hidden">
           <div className="max-w-2xl mx-auto">
             <h1 className="text-2xl font-bold mb-4">{lesson.title}</h1>
             <div className="prose">
@@ -146,32 +146,59 @@ export default function Study({
         </div>
 
         {/* 右側:ChatGPTスタイルのインターフェース */}
-        <div className="w-1/2 bg-[#343541] flex flex-col">
+        <div className="w-[80%] bg-[#1a1a1a] flex flex-col">
           {/* メッセージ表示エリア */}
-          <div className="flex-1 overflow-hidden p-4 space-y-4">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${
-                  message.role === "assistant" ? "bg-[#444654]" : ""
-                } p-4 rounded`}
-              >
-                <div className={`flex-1 text-white whitespace-pre-wrap`}>
-                  {message.content}
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="max-w-3xl mx-auto space-y-4">
+              {messages.map((message, index) => (
+                <div
+                  key={index}
+                  className={`flex items-start gap-2 ${
+                    message.role === "user" ? "flex-row-reverse" : "flex-row"
+                  }`}
+                >
+                  {/* アイコン */}
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      message.role === "assistant"
+                        ? "bg-[#19c37d]"
+                        : "bg-blue-500"
+                    }`}
+                  >
+                    {message.role === "assistant" ? "AI" : "U"}
+                  </div>
+
+                  {/* メッセージ */}
+                  <div
+                    className={`max-w-[80%] ${
+                      message.role === "user" ? "bg-blue-500" : "bg-[#2a2a2a]"
+                    } rounded-2xl px-4 py-2 text-white relative`}
+                  >
+                    {/* 吹き出しの三角形 */}
+                    <div
+                      className={`absolute top-3 w-2 h-2 transform rotate-45 ${
+                        message.role === "user"
+                          ? "right-[-4px] bg-blue-500"
+                          : "left-[-4px] bg-[#2a2a2a]"
+                      }`}
+                    ></div>
+                    <div className="whitespace-pre-wrap">{message.content}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* 入力エリア */}
-          <div className="border-t border-gray-600 p-4">
-            <div className="max-w-3xl mx-auto flex gap-4">
+          <div className="border-t border-gray-800 bg-[#1a1a1a] p-4">
+            <div className="max-w-3xl mx-auto relative">
               <textarea
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
-                className="flex-1 bg-[#40414f] text-white rounded-lg p-3 resize-none"
-                rows={3}
+                className="w-full bg-[#2a2a2a] text-white rounded-lg pl-4 pr-12 py-3 resize-none border border-gray-700 focus:border-gray-500 focus:ring-0 focus:outline-none"
+                rows={1}
                 placeholder="分析結果を入力してください..."
+                style={{ minHeight: "44px", maxHeight: "200px" }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -181,10 +208,25 @@ export default function Study({
               />
               <button
                 onClick={handleSubmit}
-                className="bg-[#19c37d] text-white px-4 py-2 rounded-lg hover:bg-[#1a8870] transition-colors"
+                className="absolute right-2 bottom-1.5 text-gray-400 hover:text-white p-1 rounded transition-colors"
+                disabled={!userInput.trim()}
               >
-                送信
+                <svg
+                  stroke="currentColor"
+                  fill="currentColor"
+                  strokeWidth="0"
+                  viewBox="0 0 20 20"
+                  className="h-5 w-5 rotate-90"
+                  height="1em"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
+                </svg>
               </button>
+            </div>
+            <div className="max-w-3xl mx-auto mt-2 text-xs text-center text-gray-500">
+              Enterキーで送信 / Shift + Enterで改行
             </div>
           </div>
         </div>
@@ -196,8 +238,17 @@ export default function Study({
             className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-[#19c37d] text-white px-6 py-2 rounded-full shadow-lg hover:bg-[#1a8870] transition-colors flex items-center gap-2"
           >
             スライドを見る
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                clipRule="evenodd"
+              />
             </svg>
           </button>
         )}
