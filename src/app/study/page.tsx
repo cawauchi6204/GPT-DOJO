@@ -16,7 +16,7 @@ export default function Study({
 }: {
   searchParams: { lessonId?: string };
 }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(true);
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState<
     { role: "user" | "assistant"; content: string }[]
