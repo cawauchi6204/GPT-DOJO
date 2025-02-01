@@ -93,7 +93,7 @@ export default function Study({
 
   if (isLoading) {
     return (
-      <Layout>
+      <Layout hideFooter={true}>
         <div className="flex justify-center items-center min-h-screen">
           <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-indigo-600"></div>
         </div>
@@ -103,7 +103,7 @@ export default function Study({
 
   if (error || !lesson) {
     return (
-      <Layout>
+      <Layout hideFooter={true}>
         <div className="flex justify-center items-center min-h-screen">
           <div className="text-red-600">
             <h2 className="text-2xl font-bold mb-2">エラーが発生しました</h2>
@@ -115,84 +115,80 @@ export default function Study({
   }
 
   return (
-    <Layout>
-      <div className="flex flex-col h-[calc(100vh-64px)]">
-        <div className="flex flex-1 overflow-hidden">
-          {/* 左側:説明エリア */}
-          <div className="w-1/2 bg-gray-50 p-6 overflow-hidden">
-            <div className="max-w-2xl mx-auto">
-              <h1 className="text-2xl font-bold mb-4">{lesson.title}</h1>
-              <div className="prose">
-                <p className="mb-4">{lesson.description}</p>
-                <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-                  <h2 className="font-semibold mb-2">見本</h2>
-                  <code className="block bg-white p-3 rounded">
-                    {lesson.content}
-                  </code>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 右側:ChatGPTスタイルのインターフェース */}
-          <div className="w-1/2 bg-[#343541] flex flex-col">
-            {/* メッセージ表示エリア */}
-            <div className="flex-1 overflow-hidden p-4 space-y-4">
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`flex ${
-                    message.role === "assistant" ? "bg-[#444654]" : ""
-                  } p-4 rounded`}
-                >
-                  <div className={`flex-1 text-white whitespace-pre-wrap`}>
-                    {message.content}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* 入力エリア */}
-            <div className="border-t border-gray-600 p-4">
-              <div className="max-w-3xl mx-auto flex gap-4">
-                <textarea
-                  value={userInput}
-                  onChange={(e) => setUserInput(e.target.value)}
-                  className="flex-1 bg-[#40414f] text-white rounded-lg p-3 resize-none"
-                  rows={3}
-                  placeholder="分析結果を入力してください..."
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSubmit();
-                    }
-                  }}
-                />
-                <button
-                  onClick={handleSubmit}
-                  className="bg-[#19c37d] text-white px-4 py-2 rounded-lg hover:bg-[#1a8870] transition-colors"
-                >
-                  送信
-                </button>
+    <Layout hideFooter={true}>
+      <div className="flex h-[calc(100vh-64px)] relative">
+        {/* 左側:説明エリア */}
+        <div className="w-1/2 bg-gray-50 p-6 overflow-hidden">
+          <div className="max-w-2xl mx-auto">
+            <h1 className="text-2xl font-bold mb-4">{lesson.title}</h1>
+            <div className="prose">
+              <p className="mb-4">{lesson.description}</p>
+              <div className="mt-8 p-4 bg-gray-100 rounded-lg">
+                <h2 className="font-semibold mb-2">見本</h2>
+                <code className="block bg-white p-3 rounded">
+                  {lesson.content}
+                </code>
               </div>
             </div>
           </div>
         </div>
 
-        {/* フッター */}
-        <div className="h-[5vh] bg-gray-100 flex items-center justify-center border-t border-gray-200">
-          {lesson.slides && lesson.slides.length > 0 && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-[#19c37d] text-white px-6 py-2 rounded-full shadow-lg hover:bg-[#1a8870] transition-colors flex items-center gap-2"
-            >
-              スライドを見る
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-              </svg>
-            </button>
-          )}
+        {/* 右側:ChatGPTスタイルのインターフェース */}
+        <div className="w-1/2 bg-[#343541] flex flex-col">
+          {/* メッセージ表示エリア */}
+          <div className="flex-1 overflow-hidden p-4 space-y-4">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex ${
+                  message.role === "assistant" ? "bg-[#444654]" : ""
+                } p-4 rounded`}
+              >
+                <div className={`flex-1 text-white whitespace-pre-wrap`}>
+                  {message.content}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 入力エリア */}
+          <div className="border-t border-gray-600 p-4">
+            <div className="max-w-3xl mx-auto flex gap-4">
+              <textarea
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                className="flex-1 bg-[#40414f] text-white rounded-lg p-3 resize-none"
+                rows={3}
+                placeholder="分析結果を入力してください..."
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit();
+                  }
+                }}
+              />
+              <button
+                onClick={handleSubmit}
+                className="bg-[#19c37d] text-white px-4 py-2 rounded-lg hover:bg-[#1a8870] transition-colors"
+              >
+                送信
+              </button>
+            </div>
+          </div>
         </div>
+
+        {/* スライドを見るボタン */}
+        {lesson.slides && lesson.slides.length > 0 && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-[#19c37d] text-white px-6 py-2 rounded-full shadow-lg hover:bg-[#1a8870] transition-colors flex items-center gap-2"
+          >
+            スライドを見る
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* スライドモーダル */}
