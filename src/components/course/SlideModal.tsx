@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 interface Slide {
   title: string;
@@ -10,13 +10,13 @@ interface Slide {
   code?: string;
   preview?: string;
   isLastSlide?: boolean;
-  type?: 'title' | 'content' | 'code' | 'image' | 'end';
+  type?: "title" | "content" | "code" | "image" | "end";
   style?: {
     background_color?: string;
-    theme?: 'light' | 'dark';
+    theme?: "light" | "dark";
     layout?: string;
   };
-  transition?: 'slide' | 'fade';
+  transition?: "slide" | "fade";
   thumbnail_url?: string;
 }
 
@@ -39,33 +39,37 @@ const transitions = {
   },
 };
 
-export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps) {
+export default function SlideModal({
+  isOpen,
+  onClose,
+  slides,
+}: SlideModalProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' && currentSlide < slides.length - 1) {
+      if (e.key === "ArrowRight" && currentSlide < slides.length - 1) {
         setCurrentSlide(currentSlide + 1);
-      } else if (e.key === 'ArrowLeft' && currentSlide > 0) {
+      } else if (e.key === "ArrowLeft" && currentSlide > 0) {
         setCurrentSlide(currentSlide - 1);
-      } else if (e.key === 'Enter' && slides[currentSlide].isLastSlide) {
+      } else if (e.key === "Enter" && slides[currentSlide].isLastSlide) {
         onClose();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [currentSlide, slides, onClose]);
 
   if (!isOpen) return null;
 
   const currentSlideData = slides[currentSlide];
-  const transitionType = currentSlideData.transition || 'slide';
+  const transitionType = currentSlideData.transition || "slide";
   const slideStyle = currentSlideData.style || {};
-  const theme = slideStyle.theme || 'light';
+  const theme = slideStyle.theme || "light";
 
   const renderSlideContent = () => {
-    if (currentSlideData.type === 'end') {
+    if (currentSlideData.type === "end") {
       return (
         <div className="flex flex-col items-center justify-center text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">
@@ -86,7 +90,7 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
     }
 
     switch (currentSlideData.type) {
-      case 'title':
+      case "title":
         return (
           <div className="text-center">
             <h1
@@ -99,13 +103,12 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
             />
           </div>
         );
-      case 'code':
+      case "code":
         return (
           <div>
-            <h2
-              className="text-xl md:text-2xl font-bold mb-3 md:mb-4"
-              dangerouslySetInnerHTML={{ __html: currentSlideData.title }}
-            />
+            <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">
+              {currentSlideData.title}
+            </h2>
             <div
               className="mb-4 md:mb-6"
               dangerouslySetInnerHTML={{ __html: currentSlideData.content }}
@@ -117,13 +120,12 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
             </div>
           </div>
         );
-      case 'image':
+      case "image":
         return (
           <div className="text-center">
-            <h2
-              className="text-xl md:text-2xl font-bold mb-3 md:mb-4"
-              dangerouslySetInnerHTML={{ __html: currentSlideData.title }}
-            />
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 md:mb-4">
+              {currentSlideData.title}
+            </h2>
             {currentSlideData.thumbnail_url && (
               <div className="relative w-full aspect-video">
                 <Image
@@ -143,10 +145,9 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
       default:
         return (
           <div>
-            <h2
-              className="text-xl md:text-2xl font-bold mb-3 md:mb-4"
-              dangerouslySetInnerHTML={{ __html: currentSlideData.title }}
-            />
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 md:mb-4">
+              {currentSlideData.title}
+            </h2>
             <div
               className="mb-4 md:mb-6"
               dangerouslySetInnerHTML={{ __html: currentSlideData.content }}
@@ -166,7 +167,9 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
                     <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-yellow-500"></div>
                     <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-green-500"></div>
                   </div>
-                  <span className="ml-2 text-xs md:text-sm text-gray-500">プレビュー</span>
+                  <span className="ml-2 text-xs md:text-sm text-gray-500">
+                    プレビュー
+                  </span>
                 </div>
                 <div
                   dangerouslySetInnerHTML={{ __html: currentSlideData.preview }}
@@ -183,7 +186,9 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
       <div
         className={`w-[98%] h-[800px] rounded-lg relative ${
-          theme === 'dark' ? 'bg-[#1e1e1e] text-white' : 'bg-[#e6f3ff] text-gray-900'
+          theme === "dark"
+            ? "bg-[#1e1e1e] text-white"
+            : "bg-[#e6f3ff] text-gray-900"
         }`}
         style={{
           backgroundColor: slideStyle.background_color,
@@ -210,7 +215,7 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
         </button>
 
         {/* Slide content */}
-        <div className="h-full flex flex-col">
+        <div className=" h-full flex flex-col">
           <div className="flex-1 overflow-hidden overflow-y-auto">
             <AnimatePresence mode="wait">
               <motion.div
@@ -219,11 +224,9 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
                 animate={transitions[transitionType].animate}
                 exit={transitions[transitionType].exit}
                 transition={{ duration: 0.3 }}
-                className="h-full flex items-center justify-center p-8 md:p-12"
+                className="h-full items-start flex justify-center p-8 md:p-12"
               >
-                <div className="w-full max-w-6xl">
-                  {renderSlideContent()}
-                </div>
+                <div className="w-full max-w-6xl">{renderSlideContent()}</div>
               </motion.div>
             </AnimatePresence>
           </div>
@@ -234,8 +237,8 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
               onClick={() => setCurrentSlide(currentSlide - 1)}
               className={`p-2 rounded text-sm md:text-base ${
                 currentSlide === 0
-                  ? 'text-gray-400 cursor-not-allowed'
-                  : 'text-current hover:bg-gray-200/20'
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-current hover:bg-gray-200/20"
               }`}
               disabled={currentSlide === 0}
             >
@@ -246,7 +249,7 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
             </div>
             <button
               onClick={() => {
-                if (currentSlideData.type === 'end') {
+                if (currentSlideData.type === "end") {
                   onClose();
                 } else {
                   setCurrentSlide(currentSlide + 1);
@@ -255,7 +258,7 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
               className="p-2 rounded text-current hover:bg-gray-200/20 text-sm md:text-base"
               disabled={currentSlide === slides.length - 1}
             >
-              {currentSlideData.type === 'end' ? '演習に進む →' : '次へ →'}
+              {currentSlideData.type === "end" ? "演習に進む →" : "次へ →"}
             </button>
           </div>
         </div>
