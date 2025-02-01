@@ -178,7 +178,7 @@ export default function SlideModal({ isOpen, onClose, slides }: SlideModalProps)
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
       <div
-        className={`w-full max-w-6xl h-[80vh] rounded-lg relative overflow-hidden ${
+        className={`w-[98vw] h-[98vh] rounded-lg relative overflow-hidden ${
           theme === 'dark' ? 'bg-[#1e1e1e] text-white' : 'bg-[#e6f3ff] text-gray-900'
         }`}
         style={{
