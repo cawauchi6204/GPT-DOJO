@@ -1,12 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useChat } from 'ai/react';
-import type { Message } from 'ai';
+import { useState, useEffect, useRef } from "react";
 import Layout from "@/components/layout/Layout";
 import SlideModal from "@/components/course/SlideModal";
 import { lessonRepository } from "@/lib/supabase/client";
 import type { Database } from "@/database.types";
+
+type Message = {
+  id: string;
+  role: 'user' | 'system';
+  content: string;
+};
 
 type Lesson = Database["public"]["Tables"]["lessons"]["Row"] & {
   course?: Database["public"]["Tables"]["courses"]["Row"] | null;
@@ -22,10 +26,18 @@ export default function Study({
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
-    api: '/api/chat',
-  });
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   // エスケープキーでスライドを閉じる
   useEffect(() => {
@@ -72,6 +84,75 @@ export default function Study({
 
     fetchLesson();
   }, [searchParams.lessonId]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isStreaming) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: input,
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setIsStreaming(true);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: messages.concat(userMessage).map(({ role, content }) => ({
+            role,
+            content,
+          })),
+        }),
+      });
+
+      if (!response.ok) throw new Error('API request failed');
+      if (!response.body) throw new Error('Response body is null');
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      const assistantMessageId = Date.now().toString();
+      setMessages(prev => [...prev, {
+        id: assistantMessageId,
+        role: 'system',
+        content: '',
+      }]);
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const text = decoder.decode(value);
+          setMessages(prev => prev.map(msg => 
+            msg.id === assistantMessageId
+              ? { ...msg, content: msg.content + text }
+              : msg
+          ));
+          scrollToBottom();
+        }
+      } finally {
+        reader.releaseLock();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'system',
+        content: 'エラーが発生しました。もう一度お試しください。',
+      }]);
+    } finally {
+      setIsStreaming(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -120,7 +201,7 @@ export default function Study({
           {/* メッセージ表示エリア */}
           <div className="flex-1 overflow-y-auto p-4">
             <div className="max-w-3xl mx-auto space-y-4">
-              {messages.map((message: Message) => (
+              {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex items-start gap-2 ${
@@ -129,9 +210,9 @@ export default function Study({
                 >
                   {/* アイコン */}
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    message.role === "assistant" ? "bg-[#19c37d]" : "bg-blue-500"
+                    message.role === "system" ? "bg-[#19c37d]" : "bg-blue-500"
                   }`}>
-                    {message.role === "assistant" ? "AI" : "U"}
+                    {message.role === "system" ? "AI" : "U"}
                   </div>
                   
                   {/* メッセージ */}
@@ -148,6 +229,7 @@ export default function Study({
                   </div>
                 </div>
               ))}
+              <div ref={messagesEndRef} />
             </div>
           </div>
 
@@ -156,7 +238,7 @@ export default function Study({
             <form onSubmit={handleSubmit} className="max-w-3xl mx-auto relative">
               <textarea
                 value={input}
-                onChange={handleInputChange}
+                onChange={(e) => setInput(e.target.value)}
                 className="w-full bg-[#2a2a2a] text-white rounded-lg pl-4 pr-12 py-3 resize-none border border-gray-700 focus:border-gray-500 focus:ring-0 focus:outline-none"
                 rows={1}
                 placeholder="分析結果を入力してください..."
@@ -167,11 +249,12 @@ export default function Study({
                     handleSubmit(e);
                   }
                 }}
+                disabled={isStreaming}
               />
               <button
                 type="submit"
-                className="absolute right-2 bottom-1.5 text-gray-400 hover:text-white p-1 rounded transition-colors"
-                disabled={!input.trim()}
+                className="absolute right-2 bottom-1.5 text-gray-400 hover:text-white p-1 rounded transition-colors disabled:opacity-50"
+                disabled={!input.trim() || isStreaming}
               >
                 <svg
                   stroke="currentColor"

@@ -1,5 +1,4 @@
-import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { OpenAI } from 'openai';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
@@ -8,12 +7,11 @@ const openai = new OpenAI({
 export const runtime = 'edge';
 
 export async function POST(req: Request) {
-  try {
-    const { messages } = await req.json();
+  const { messages } = await req.json();
 
+  try {
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
-      stream: true,
       messages: [
         {
           role: 'system',
@@ -21,17 +19,16 @@ export async function POST(req: Request) {
         },
         ...messages,
       ],
+      stream: true,
     });
-
-    // Transform the response into a readable stream
-    const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
       async start(controller) {
         for await (const chunk of response) {
-          const text = chunk.choices[0]?.delta?.content || '';
-          if (text) {
-            controller.enqueue(encoder.encode(text));
+          const content = chunk.choices[0]?.delta?.content;
+          if (content) {
+            const bytes = new TextEncoder().encode(content);
+            controller.enqueue(bytes);
           }
         }
         controller.close();
@@ -47,6 +44,11 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error('Error in chat route:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 }
