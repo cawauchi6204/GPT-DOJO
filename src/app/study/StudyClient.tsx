@@ -246,7 +246,7 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
                 onChange={(e) => setInput(e.target.value)}
                 className="w-full bg-[#2a2a2a] text-white rounded-lg pl-3 md:pl-4 pr-10 md:pr-12 py-2 md:py-3 resize-none border border-gray-700 focus:border-gray-500 focus:ring-0 focus:outline-none text-sm md:text-base"
                 rows={1}
-                placeholder="分析結果を入力してください..."
+                placeholder="GPT DOJOが世の中で流行る方法を考えてください"
                 style={{ minHeight: "44px", maxHeight: "200px" }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -261,7 +261,7 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
               />
               <button
                 type="submit"
-                className="absolute right-2 bottom-1.5 text-gray-400 hover:text-white p-1 rounded transition-colors disabled:opacity-50"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1 rounded transition-colors disabled:opacity-50"
                 disabled={!input.trim() || isStreaming}
               >
                 <svg
