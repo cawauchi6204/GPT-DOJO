@@ -2,11 +2,21 @@
 
 import Link from "next/link";
 
+interface Lesson {
+  id: string;
+  title: string;
+}
+
+interface Course {
+  id: string;
+  title: string;
+}
+
 interface NextLessonModalProps {
   isOpen: boolean;
   onClose: () => void;
-  nextLesson: any;
-  nextCourse: any;
+  nextLesson: Lesson | null;
+  nextCourse: Course | null;
 }
 
 export default function NextLessonModal({

@@ -151,13 +151,6 @@ export default function StudyClient({
     }
   };
 
-  const handleSlideModalClose = () => {
-    setIsModalOpen(false);
-    if (nextLesson) {
-      setIsNextLessonModalOpen(true);
-    }
-  };
-
   if (error) {
     return (
       <Layout hideFooter={true}>
