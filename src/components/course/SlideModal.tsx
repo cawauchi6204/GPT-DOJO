@@ -51,7 +51,12 @@ export default function SlideModal({
   const isLastSlide = currentSlide === slides.slide.length - 1;
 
   const renderSlideContent = () => {
-    return <div dangerouslySetInnerHTML={{ __html: currentSlideData.content }} />;
+    return (
+      <div 
+        className="slide-content"
+        dangerouslySetInnerHTML={{ __html: currentSlideData.content }}
+      />
+    );
   };
 
   return (
