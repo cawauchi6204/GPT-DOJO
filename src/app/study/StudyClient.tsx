@@ -3,8 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import Layout from "@/components/layout/Layout";
 import SlideModal from "@/components/course/SlideModal";
+import NextLessonModal from "@/components/course/NextLessonModal";
 import type { Slides } from "@/types/microcms";
 import type { Database } from "@/database.types";
+import { lessonRepository } from "@/lib/supabase/client";
 
 type Message = {
   id: string;
@@ -27,6 +29,8 @@ interface StudyClientProps {
 
 export default function StudyClient({ lesson, slides, error }: StudyClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(true);
+  const [isNextLessonModalOpen, setIsNextLessonModalOpen] = useState(false);
+  const [nextLesson, setNextLesson] = useState<Lesson | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
@@ -39,6 +43,14 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    if (lesson) {
+      lessonRepository.getNextLesson(lesson.id).then(nextLesson => {
+        setNextLesson(nextLesson);
+      });
+    }
+  }, [lesson]);
 
   // エスケープキーでスライドを閉じる
   useEffect(() => {
@@ -126,6 +138,13 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
       ]);
     } finally {
       setIsStreaming(false);
+    }
+  };
+
+  const handleSlideModalClose = () => {
+    setIsModalOpen(false);
+    if (nextLesson) {
+      setIsNextLessonModalOpen(true);
     }
   };
 
@@ -289,8 +308,17 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
       {slides && slides.slide.length > 0 && (
         <SlideModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={handleSlideModalClose}
           slides={slides}
+        />
+      )}
+
+      {/* 次のレッスンモーダル */}
+      {nextLesson && (
+        <NextLessonModal
+          isOpen={isNextLessonModalOpen}
+          onClose={() => setIsNextLessonModalOpen(false)}
+          nextLesson={nextLesson}
         />
       )}
     </Layout>

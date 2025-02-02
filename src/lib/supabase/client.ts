@@ -71,13 +71,37 @@ export const lessonRepository = {
       .from('lessons')
       .select(`
         *,
-        course:courses(*),
-        slides(*)
+        course:courses(*)
       `)
       .eq('id', lessonId)
       .single()
 
     if (error) throw error
     return data
+  },
+
+  async getNextLesson(currentLessonId: string) {
+    // 現在のレッスンを取得して、そのコースIDとorder_indexを取得
+    const { data: currentLesson, error: currentError } = await supabase
+      .from('lessons')
+      .select('*')
+      .eq('id', currentLessonId)
+      .single()
+
+    if (currentError) throw currentError
+    if (!currentLesson) throw new Error('Lesson not found')
+
+    // 同じコース内で、現在のorder_indexより大きい最初のレッスンを取得
+    const { data: nextLesson, error: nextError } = await supabase
+      .from('lessons')
+      .select('*')
+      .eq('course_id', currentLesson.course_id)
+      .gt('order_index', currentLesson.order_index)
+      .order('order_index', { ascending: true })
+      .limit(1)
+      .single()
+
+    if (nextError && nextError.code !== 'PGRST116') throw nextError // PGRST116 は "結果が見つからない" エラー
+    return nextLesson || null
   }
 }
