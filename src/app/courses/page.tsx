@@ -3,18 +3,18 @@ import Link from "next/link";
 import { courseRepository } from "@/lib/supabase/client";
 import Image from "next/image";
 
-export async function generateStaticProps() {
+async function fetchCourses() {
   try {
     const courses = await courseRepository.getAllCourses();
-    return { courses: courses || [] };
+    return courses || [];
   } catch (error) {
     console.error("Error fetching courses:", error);
-    return { courses: [] };
+    return [];
   }
 }
 
 export default async function Courses() {
-  const { courses } = await generateStaticProps();
+  const courses = await fetchCourses();
 
   return (
     <Layout>
