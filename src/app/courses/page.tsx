@@ -1,58 +1,21 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { courseRepository } from "@/lib/supabase/client";
 import type { Database } from "@/database.types";
 import Image from "next/image";
 
-type Course = Database["public"]["Tables"]["courses"]["Row"];
-
-export default function Courses() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const data = await courseRepository.getAllCourses();
-        setCourses(data || []);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "コースの読み込みに失敗しました"
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCourses();
-  }, []);
-
-  if (isLoading) {
-    return (
-      <Layout>
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-indigo-600"></div>
-        </div>
-      </Layout>
-    );
+export async function generateStaticProps() {
+  try {
+    const courses = await courseRepository.getAllCourses();
+    return { courses: courses || [] };
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+    return { courses: [] };
   }
+}
 
-  if (error) {
-    return (
-      <Layout>
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="text-red-600">
-            <h2 className="text-2xl font-bold mb-2">エラーが発生しました</h2>
-            <p>{error}</p>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
+export default async function Courses() {
+  const { courses } = await generateStaticProps();
 
   return (
     <Layout>
