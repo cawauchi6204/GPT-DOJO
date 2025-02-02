@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
 import localFont from "next/font/local";
 
 const geistMono = localFont({
@@ -26,8 +26,49 @@ const geist = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "GPT DOJO",
-  description: "プログラミング学習プラットフォーム",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  title: {
+    default: "GPT DOJO",
+    template: "%s | GPT DOJO",
+  },
+  description: "今日から生成AIを味方にするためのプラットフォームGPT DOJO",
+  keywords: ["プロンプト", "プロンプトエンジニアリング", "学習", "AI", "GPT", "教育"],
+  authors: [{ name: "GPT DOJO Team" }],
+  openGraph: {
+    type: "website",
+    siteName: "GPT DOJO",
+    title: "GPT DOJO",
+    description: "AIを活用したプログラミング学習プラットフォーム",
+    images: [
+      {
+        url: "/images/ogp.png",
+        width: 1200,
+        height: 630,
+        alt: "GPT DOJO",
+      },
+    ],
+    locale: "ja_JP",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GPT DOJO",
+    description: "今日から生成AIを味方にするためのプラットフォームGPT DOJO",
+    images: ["/images/ogp.png"],
+    creator: "@gptdojo",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
+  manifest: "/manifest.json",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+  },
 };
 
 export default function RootLayout({

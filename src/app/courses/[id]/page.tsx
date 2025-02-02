@@ -1,32 +1,60 @@
-import Layout from "@/components/layout/Layout";
-import Link from "next/link";
+import { Metadata } from "next";
 import { courseRepository, lessonRepository } from "@/lib/supabase/client";
-// import type { Database } from "@/database.types";
+import Layout from "@/components/layout/Layout";
+import type { Database } from "@/database.types";
 
-// type Course = Database["public"]["Tables"]["courses"]["Row"];
+type Props = {
+  params: { id: string };
+};
 
-// // 静的生成のためのパラメータを定義
-// export async function generateStaticParams() {
-//   const courses: Course[] = await courseRepository.getAllCourses();
-//   return courses.map((course) => ({
-//     id: course.id,
-//   }));
-// }
+type Lesson = Database["public"]["Tables"]["lessons"]["Row"];
 
-// ページコンポーネントをasync関数に変更
-export default async function Course({ params }: { params: { id: string } }) {
-  // データフェッチを直接実行
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const course = await courseRepository.getCourseById(params.id);
-  const lessonsData = await lessonRepository.getLessonsByCourseId(params.id);
-  // const lessons = lessonsData?.sort((a, b) => a.order_index - b.order_index) ?? [];
+
+  return {
+    title: course?.title || "コース詳細",
+    description: course?.description || "コースの詳細ページです",
+    openGraph: {
+      title: course?.title || "コース詳細",
+      description: course?.description || "コースの詳細ページです",
+      images: [
+        {
+          url: course?.thumbnail_url || "/images/lesson-icon.png",
+          width: 1200,
+          height: 630,
+          alt: course?.title || "コース詳細",
+        },
+      ],
+      type: "website",
+      siteName: "GPT DOJO",
+      locale: "ja_JP",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: course?.title || "コース詳細",
+      description: course?.description || "コースの詳細ページです",
+      images: [course?.thumbnail_url || "/images/lesson-icon.png"],
+    },
+  };
+}
+
+export default async function CoursePage({ params }: Props) {
+  const [course, lessons] = await Promise.all([
+    courseRepository.getCourseById(params.id),
+    lessonRepository.getLessonsByCourseId(params.id),
+  ]);
 
   if (!course) {
     return (
       <Layout>
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="text-red-600">
-            <h2 className="text-2xl font-bold mb-2">エラーが発生しました</h2>
-            <p>コースが見つかりません</p>
+        <div className="min-h-screen bg-gray-50 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-gray-900">
+                コースが見つかりません
+              </h1>
+            </div>
           </div>
         </div>
       </Layout>
@@ -35,55 +63,72 @@ export default async function Course({ params }: { params: { id: string } }) {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 py-6 md:py-12">
-        <div className="mb-6 md:mb-12">
-          <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">{course.title}</h1>
-          <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-8">
-            {course.description}
-          </p>
-          <div className="flex flex-wrap gap-4 text-sm md:text-base">
-            <div className="bg-gray-100 px-3 py-1 rounded-full">
-              {lessonsData.length}レッスン
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            {/* コースヘッダー */}
+            <div className="relative h-64 bg-gray-200">
+              {course.thumbnail_url && (
+                <img
+                  src={course.thumbnail_url}
+                  alt={course.title}
+                  className="w-full h-full object-cover"
+                />
+              )}
+              <div className="absolute inset-0 bg-black bg-opacity-40" />
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <h1 className="text-3xl font-bold mb-2">{course.title}</h1>
+                <p className="text-lg">{course.description}</p>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className="space-y-4 md:space-y-6">
-          {/* レッスンリスト */}
-          {lessonsData.map((lesson, index) => (
-            <div key={lesson.id} className="bg-white rounded-lg shadow-md p-4 md:p-6">
-              <Link
-                href={`/study?lessonId=${lesson.id}`}
-                className="flex items-start gap-4 hover:bg-gray-50 -m-4 md:-m-6 p-4 md:p-6 transition-colors"
-              >
-                <div className="w-8 h-8 md:w-10 md:h-10 bg-[#19c37d] text-white rounded-full flex items-center justify-center flex-shrink-0">
-                  {index + 1}
+            {/* コース情報 */}
+            <div className="p-6">
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold mb-4">コース概要</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-sm text-gray-500">難易度</div>
+                    <div className="font-medium">{course.level}</div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-sm text-gray-500">レッスン数</div>
+                    <div className="font-medium">{lessons.length} レッスン</div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="text-sm text-gray-500">所要時間</div>
+                    <div className="font-medium">{course.duration} 時間</div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg md:text-xl font-semibold mb-2">{lesson.title}</h3>
-                  <p className="text-sm md:text-base text-gray-600">
-                    {lesson.description}
-                  </p>
-                </div>
-              </Link>
-            </div>
-          ))}
+              </div>
 
-          {lessonsData.length === 0 && (
-            <div className="bg-white rounded-lg shadow-md p-4 md:p-6 opacity-50">
-              <div className="flex items-start gap-4">
-                <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-400 text-white rounded-full flex items-center justify-center flex-shrink-0">
-                  1
-                </div>
-                <div>
-                  <h3 className="text-lg md:text-xl font-semibold mb-2">レッスンがありません</h3>
-                  <p className="text-sm md:text-base text-gray-600">
-                    新しいレッスンを準備中です。お楽しみに!
-                  </p>
+              {/* レッスン一覧 */}
+              <div>
+                <h2 className="text-2xl font-bold mb-4">レッスン一覧</h2>
+                <div className="space-y-4">
+                  {lessons.map((lesson: Lesson, index: number) => (
+                    <a
+                      key={lesson.id}
+                      href={`/study?lessonId=${lesson.id}`}
+                      className="block bg-gray-50 hover:bg-gray-100 transition-colors p-4 rounded-lg"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="flex-shrink-0 w-8 h-8 bg-[#19c37d] text-white rounded-full flex items-center justify-center">
+                          {index + 1}
+                        </div>
+                        <div>
+                          <h3 className="font-medium">{lesson.title}</h3>
+                          <p className="text-sm text-gray-500">
+                            {lesson.description}
+                          </p>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
                 </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </Layout>
