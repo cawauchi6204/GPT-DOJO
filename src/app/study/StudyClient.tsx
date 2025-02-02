@@ -27,7 +27,11 @@ interface StudyClientProps {
   };
 }
 
-export default function StudyClient({ lesson, slides, error }: StudyClientProps) {
+export default function StudyClient({
+  lesson,
+  slides,
+  error,
+}: StudyClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [isNextLessonModalOpen, setIsNextLessonModalOpen] = useState(false);
   const [nextLesson, setNextLesson] = useState<Lesson | null>(null);
@@ -46,7 +50,7 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
 
   useEffect(() => {
     if (lesson) {
-      lessonRepository.getNextLesson(lesson.id).then(nextLesson => {
+      lessonRepository.getNextLesson(lesson.id).then((nextLesson) => {
         setNextLesson(nextLesson);
       });
     }
@@ -183,6 +187,17 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
                     {lesson.content}
                   </code>
                 </div>
+
+                {/* できた!ボタンを追加 */}
+                <button
+                  className="w-full mt-6 bg-[#19c37d] text-white py-3 rounded-lg hover:bg-[#1a8870] transition-colors font-bold"
+                  onClick={() => {
+                    // ここにできた!ボタンを押した時の処理を追加
+                    setIsNextLessonModalOpen(true);
+                  }}
+                >
+                  できた!
+                </button>
               </div>
             </div>
           </div>
@@ -191,7 +206,7 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
           {slides && slides.slide.length > 0 && (
             <button
               onClick={() => setIsModalOpen(true)}
-              className="h-[50px] w-full bg-[#19c37d] text-white hover:bg-[#1a8870] transition-colors flex items-center justify-center gap-2 text-sm md:text-base"
+              className="h-[50px] w-full bg-blue-500  text-white hover:bg-blue-600  transition-colors flex items-center justify-center gap-2 text-sm md:text-base"
             >
               スライドを見る
               <svg
@@ -259,7 +274,10 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
 
           {/* 入力エリア */}
           <div className="border-t border-gray-800 bg-[#1a1a1a] p-3 md:p-4">
-            <form onSubmit={handleSubmit} className="max-w-3xl mx-auto relative">
+            <form
+              onSubmit={handleSubmit}
+              className="max-w-3xl mx-auto relative"
+            >
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
