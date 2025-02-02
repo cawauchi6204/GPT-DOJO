@@ -1,33 +1,15 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
-import { courseRepository } from "@/lib/supabase/client";
 import type { Database } from "@/database.types";
 import Image from "next/image";
+import { courseRepository } from "@/lib/supabase/client";
 
 type Course = Database["public"]["Tables"]["courses"]["Row"];
 
-export default function Home() {
-  const [featuredCourses, setFeaturedCourses] = useState<Course[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchFeaturedCourses = async () => {
-      try {
-        const data = await courseRepository.getFeaturedCourses();
-        setFeaturedCourses(data || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "データの読み込みに失敗しました");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchFeaturedCourses();
-  }, []);
+// サーバーコンポーネントとしてデータフェッチを行う
+export default async function Home() {
+  // データフェッチ
+  const featuredCourses = await courseRepository.getFeaturedCourses();
 
   return (
     <Layout>
@@ -52,7 +34,7 @@ export default function Home() {
         </div>
 
         {/* おすすめコース */}
-        {!isLoading && !error && featuredCourses.length > 0 && (
+        {featuredCourses && featuredCourses.length > 0 && (
           <div className="py-12 md:py-20">
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">
               おすすめのコース
