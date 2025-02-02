@@ -36,10 +36,10 @@ export default function Home() {
         <div className="py-12 md:py-20">
           <div className="text-center">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
-              ChatGPTを楽しく学ぼう
+              生成AIを味方にしよう
             </h1>
             <p className="text-lg md:text-xl text-gray-600 mb-8 md:mb-12 max-w-2xl mx-auto">
-              GPT Dojoは、ChatGPTの使い方を楽しく学べるオンライン学習プラットフォームです。
+              GPT Dojoは、ChatGPTの使い方をハンズオン形式で学べるオンライン学習プラットフォームです。
               初心者から上級者まで、ステップバイステップで学習できます。
             </p>
             <Link
@@ -117,7 +117,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
+            {/* <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
               <div className="w-12 h-12 md:w-16 md:h-16 bg-[#19c37d] text-white rounded-full flex items-center justify-center mb-4 mx-auto">
                 <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -129,7 +129,7 @@ export default function Home() {
               <p className="text-gray-600 text-center">
                 他の学習者と交流しながら、知識を深められます。
               </p>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -139,7 +139,7 @@ export default function Home() {
             さあ、始めましょう
           </h2>
           <p className="text-lg md:text-xl text-gray-600 mb-8 md:mb-12 max-w-2xl mx-auto">
-            無料のコースから、ChatGPTの学習を始めることができます。
+            今だけ完全無料のコースで、生成AIの学習を始めることができます。
           </p>
           <Link
             href="/courses"

@@ -56,7 +56,7 @@ export default function SlideModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className={`w-[98%] h-[90vh] md:h-[800px] rounded-lg relative bg-[#1e1e1e] text-white`}>
+      <div className={`w-[98%] h-[90vh] md:h-[800px] rounded-lg relative bg-white text-black`}>
         {/* Close button */}
         <button
           onClick={onClose}
@@ -95,7 +95,7 @@ export default function SlideModal({
           </div>
 
           {/* Navigation buttons */}
-          <div className="flex justify-between items-center px-4 md:px-8 py-4 md:py-6 border-t border-gray-200 dark:border-gray-700 bg-inherit">
+          <div className="flex justify-between items-center px-4 md:px-8 py-4 md:py-6  bg-inherit">
             <button
               onClick={() => setCurrentSlide(currentSlide - 1)}
               className={`p-3 md:p-2 rounded text-base md:text-base ${
@@ -119,7 +119,6 @@ export default function SlideModal({
                 }
               }}
               className="p-3 md:p-2 rounded text-current hover:bg-gray-200/20 text-base md:text-base"
-              disabled={isLastSlide}
             >
               {isLastSlide ? "演習に進む →" : "次へ →"}
             </button>
