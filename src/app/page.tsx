@@ -36,7 +36,7 @@ export default function Home() {
         <div className="py-12 md:py-20">
           <div className="text-center">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
-              生成AIを味方にしよう
+              今日から生成AIを味方にしよう
             </h1>
             <p className="text-lg md:text-xl text-gray-600 mb-8 md:mb-12 max-w-2xl mx-auto">
               GPT Dojoは、ChatGPTの使い方をハンズオン形式で学べるオンライン学習プラットフォームです。
@@ -64,7 +64,7 @@ export default function Home() {
                   href={`/courses/${course.id}`}
                   className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 md:p-6"
                 >
-                  <div className="aspect-video bg-gray-100 rounded-lg mb-4 relative">
+                  <div className="aspect-video rounded-lg mb-4 relative">
                     <Image
                       src={course.thumbnail_url || "/images/lesson-icon.png"}
                       alt={`${course.title}のサムネイル`}

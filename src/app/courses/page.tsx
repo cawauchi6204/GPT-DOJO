@@ -68,7 +68,7 @@ export default function Courses() {
               href={`/courses/${course.id}`}
               className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 md:p-6"
             >
-              <div className="aspect-video bg-gray-100 rounded-lg mb-4 relative">
+              <div className="aspect-video rounded-lg mb-4 relative">
                 <Image
                   src={course.thumbnail_url || "/images/lesson-icon.png"}
                   alt={`${course.title}のサムネイル`}
