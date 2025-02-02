@@ -1,14 +1,17 @@
 import Link from "next/link";
-
+import Image from "next/image";
 export default function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white shadow-sm z-50">
       <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
         <Link
           href="/"
-          className="text-xl md:text-2xl font-bold text-gray-900 hover:text-gray-700 transition-colors"
+          className="flex items-center text-xl md:text-2xl font-bold text-gray-900 hover:text-gray-700 transition-colors"
         >
-          GPT Dojo
+          <span>
+            GPT Dojo
+            </span>
+          <Image src="/images/dog_mono.png" alt="GPT Dojo" width={50} height={50} className="ml-2 mb-2" />
         </Link>
 
         <nav>

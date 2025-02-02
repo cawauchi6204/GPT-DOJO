@@ -1,71 +1,32 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { courseRepository, lessonRepository } from "@/lib/supabase/client";
-import type { Database } from "@/database.types";
+// import type { Database } from "@/database.types";
 
-type Course = Database["public"]["Tables"]["courses"]["Row"];
-type Lesson = Database["public"]["Tables"]["lessons"]["Row"];
+// type Course = Database["public"]["Tables"]["courses"]["Row"];
 
-interface CoursePageProps {
-  params: {
-    id: string;
-  };
-}
+// // 静的生成のためのパラメータを定義
+// export async function generateStaticParams() {
+//   const courses: Course[] = await courseRepository.getAllCourses();
+//   return courses.map((course) => ({
+//     id: course.id,
+//   }));
+// }
 
-export default function Course({ params }: CoursePageProps) {
-  const [course, setCourse] = useState<Course | null>(null);
-  const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// ページコンポーネントをasync関数に変更
+export default async function Course({ params }: { params: { id: string } }) {
+  // データフェッチを直接実行
+  const course = await courseRepository.getCourseById(params.id);
+  const lessonsData = await lessonRepository.getLessonsByCourseId(params.id);
+  // const lessons = lessonsData?.sort((a, b) => a.order_index - b.order_index) ?? [];
 
-  useEffect(() => {
-    const fetchCourseAndLessons = async () => {
-      try {
-        // コース情報を取得
-        const courseData = await courseRepository.getCourseById(params.id);
-        if (!courseData) {
-          setError("コースが見つかりません");
-          return;
-        }
-        setCourse(courseData);
-
-        // レッスン一覧を取得
-        const lessonsData = await lessonRepository.getLessonsByCourseId(params.id);
-        if (lessonsData) {
-          // order_indexでソート
-          const sortedLessons = lessonsData.sort((a, b) => a.order_index - b.order_index);
-          setLessons(sortedLessons);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "データの読み込みに失敗しました");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCourseAndLessons();
-  }, [params.id]);
-
-  if (isLoading) {
-    return (
-      <Layout>
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-indigo-600"></div>
-        </div>
-      </Layout>
-    );
-  }
-
-  if (error || !course) {
+  if (!course) {
     return (
       <Layout>
         <div className="flex justify-center items-center min-h-screen">
           <div className="text-red-600">
             <h2 className="text-2xl font-bold mb-2">エラーが発生しました</h2>
-            <p>{error || "コースが見つかりません"}</p>
+            <p>コースが見つかりません</p>
           </div>
         </div>
       </Layout>
@@ -82,14 +43,14 @@ export default function Course({ params }: CoursePageProps) {
           </p>
           <div className="flex flex-wrap gap-4 text-sm md:text-base">
             <div className="bg-gray-100 px-3 py-1 rounded-full">
-              {lessons.length}レッスン
+              {lessonsData.length}レッスン
             </div>
           </div>
         </div>
 
         <div className="space-y-4 md:space-y-6">
           {/* レッスンリスト */}
-          {lessons.map((lesson, index) => (
+          {lessonsData.map((lesson, index) => (
             <div key={lesson.id} className="bg-white rounded-lg shadow-md p-4 md:p-6">
               <Link
                 href={`/study?lessonId=${lesson.id}`}
@@ -108,7 +69,7 @@ export default function Course({ params }: CoursePageProps) {
             </div>
           ))}
 
-          {lessons.length === 0 && (
+          {lessonsData.length === 0 && (
             <div className="bg-white rounded-lg shadow-md p-4 md:p-6 opacity-50">
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-400 text-white rounded-full flex items-center justify-center flex-shrink-0">
