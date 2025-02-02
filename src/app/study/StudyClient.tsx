@@ -151,7 +151,7 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
       <div className="flex flex-col md:flex-row h-[calc(100vh-64px)] relative">
         {/* 左側:説明エリア */}
         <div className="w-full md:w-[30%] lg:w-[20%] bg-gray-50 flex flex-col">
-          <div className="flex-1 p-4 md:p-6 overflow-hidden">
+          <div className="flex-1 p-4 md:p-6 overflow-y-scroll">
             <div className="max-w-2xl mx-auto">
               <h1 className="text-xl md:text-2xl font-bold mb-4">
                 {lesson.title}
@@ -192,7 +192,7 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
         </div>
 
         {/* 右側:ChatGPTスタイルのインターフェース */}
-        <div className="w-full md:w-[70%] lg:w-[80%] bg-[#1a1a1a] flex flex-col">
+        <div className="w-full md:w-[70%] lg:w-[80%] flex-1 bg-[#1a1a1a] flex flex-col overflow-y-scroll [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {/* メッセージ表示エリア */}
           <div className="flex-1 overflow-y-auto p-3 md:p-4">
             <div className="max-w-3xl mx-auto space-y-4">

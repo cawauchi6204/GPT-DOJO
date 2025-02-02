@@ -56,7 +56,7 @@ export default function SlideModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className={`w-[98%] h-[800px] rounded-lg relative bg-[#1e1e1e] text-white`}>
+      <div className={`w-[98%] h-[calc(100vh-32px)] md:h-[800px] rounded-lg relative bg-[#1e1e1e] text-white`}>
         {/* Close button */}
         <button
           onClick={onClose}
