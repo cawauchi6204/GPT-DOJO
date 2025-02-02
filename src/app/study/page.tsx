@@ -5,7 +5,7 @@ import StudyClient from "@/app/study/StudyClient";
 export default async function StudyPage({
   searchParams,
 }: {
-  searchParams: { lessonId?: string };
+  searchParams: { lessonId?: string; draftKey?: string };
 }) {
   if (!searchParams.lessonId) {
     return (
@@ -21,7 +21,7 @@ export default async function StudyPage({
   try {
     const [lesson, slides] = await Promise.all([
       lessonRepository.getLessonById(searchParams.lessonId),
-      slideRepository.getSlidesByLessonId(searchParams.lessonId),
+      slideRepository.getSlidesByLessonId(searchParams.lessonId, searchParams.draftKey),
     ]);
 
     return <StudyClient lesson={lesson} slides={slides} />;

@@ -11,24 +11,11 @@ export const client = createClient({
 });
 
 export const slideRepository = {
-  async getSlidesByLessonId(lessonId: string): Promise<Slides> {
+  async getSlidesByLessonId(lessonId: string, draftKey?: string): Promise<Slides> {
     return client.get<Slides>({
       endpoint: "slides",
       contentId: lessonId,
+      queries: { draftKey: draftKey || undefined }
     });
   },
 };
-
-export async function fetchSlideContent(lessonId: string) {
-  try {
-    const response = await client.get({
-      endpoint: "slides",
-      contentId: lessonId,
-    });
-
-    return response.content;
-  } catch (error) {
-    console.error("Error fetching slide content:", error);
-    return ""; // もしくはエラーハンドリングの方針に応じて対応
-  }
-}
