@@ -35,6 +35,7 @@ export default function StudyClient({
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [isNextLessonModalOpen, setIsNextLessonModalOpen] = useState(false);
   const [nextLesson, setNextLesson] = useState<Lesson | null>(null);
+  const [nextCourse, setNextCourse] = useState<Database["public"]["Tables"]["courses"]["Row"] | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
@@ -50,8 +51,13 @@ export default function StudyClient({
 
   useEffect(() => {
     if (lesson) {
-      lessonRepository.getNextLesson(lesson.id).then((nextLesson) => {
+      // 次のレッスンと次のコースを取得
+      Promise.all([
+        lessonRepository.getNextLesson(lesson.id),
+        lessonRepository.getNextCourse(lesson.course_id)
+      ]).then(([nextLesson, nextCourse]) => {
         setNextLesson(nextLesson);
+        setNextCourse(nextCourse);
       });
     }
   }, [lesson]);
@@ -192,8 +198,9 @@ export default function StudyClient({
                 <button
                   className="w-full mt-6 bg-[#19c37d] text-white py-3 rounded-lg hover:bg-[#1a8870] transition-colors font-bold"
                   onClick={() => {
-                    // ここにできた!ボタンを押した時の処理を追加
-                    setIsNextLessonModalOpen(true);
+                    if (nextLesson) {
+                      setIsNextLessonModalOpen(true);
+                    }
                   }}
                 >
                   できた!
@@ -326,7 +333,7 @@ export default function StudyClient({
       {slides && slides.slide.length > 0 && (
         <SlideModal
           isOpen={isModalOpen}
-          onClose={handleSlideModalClose}
+          onClose={() => setIsModalOpen(false)}
           slides={slides}
         />
       )}
@@ -337,6 +344,7 @@ export default function StudyClient({
           isOpen={isNextLessonModalOpen}
           onClose={() => setIsNextLessonModalOpen(false)}
           nextLesson={nextLesson}
+          nextCourse={nextCourse}
         />
       )}
     </Layout>

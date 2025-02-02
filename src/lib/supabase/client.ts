@@ -103,5 +103,29 @@ export const lessonRepository = {
 
     if (nextError && nextError.code !== 'PGRST116') throw nextError // PGRST116 は "結果が見つからない" エラー
     return nextLesson || null
+  },
+
+  async getNextCourse(currentCourseId: string) {
+    // 現在のコースを取得して、そのcreated_atを取得
+    const { data: currentCourse, error: currentError } = await supabase
+      .from('courses')
+      .select('*')
+      .eq('id', currentCourseId)
+      .single()
+
+    if (currentError) throw currentError
+    if (!currentCourse) throw new Error('Course not found')
+
+    // 現在のコースより新しい（created_atが大きい）最初のコースを取得
+    const { data: nextCourse, error: nextError } = await supabase
+      .from('courses')
+      .select('*')
+      .gt('created_at', currentCourse.created_at)
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .single()
+
+    if (nextError && nextError.code !== 'PGRST116') throw nextError // PGRST116 は "結果が見つからない" エラー
+    return nextCourse || null
   }
 }
