@@ -27,15 +27,10 @@ interface StudyClientProps {
   };
 }
 
-export default function StudyClient({
-  lesson,
-  slides,
-  error,
-}: StudyClientProps) {
+export default function StudyClient({ lesson, slides, error }: StudyClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [isNextLessonModalOpen, setIsNextLessonModalOpen] = useState(false);
   const [nextLesson, setNextLesson] = useState<Lesson | null>(null);
-  const [nextCourse, setNextCourse] = useState<Database["public"]["Tables"]["courses"]["Row"] | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
@@ -51,13 +46,8 @@ export default function StudyClient({
 
   useEffect(() => {
     if (lesson) {
-      // 次のレッスンと次のコースを取得
-      Promise.all([
-        lessonRepository.getNextLesson(lesson.id),
-        lessonRepository.getNextCourse(lesson.course_id)
-      ]).then(([nextLesson, nextCourse]) => {
+      lessonRepository.getNextLesson(lesson.id).then(nextLesson => {
         setNextLesson(nextLesson);
-        setNextCourse(nextCourse);
       });
     }
   }, [lesson]);
@@ -151,6 +141,13 @@ export default function StudyClient({
     }
   };
 
+  const handleSlideModalClose = () => {
+    setIsModalOpen(false);
+    if (nextLesson) {
+      setIsNextLessonModalOpen(true);
+    }
+  };
+
   if (error) {
     return (
       <Layout hideFooter={true}>
@@ -186,18 +183,6 @@ export default function StudyClient({
                     {lesson.content}
                   </code>
                 </div>
-
-                {/* できた!ボタンを追加 */}
-                <button
-                  className="w-full mt-6 bg-[#19c37d] text-white py-3 rounded-lg hover:bg-[#1a8870] transition-colors font-bold"
-                  onClick={() => {
-                    if (nextLesson) {
-                      setIsNextLessonModalOpen(true);
-                    }
-                  }}
-                >
-                  できた!
-                </button>
               </div>
             </div>
           </div>
@@ -326,7 +311,7 @@ export default function StudyClient({
       {slides && slides.slide.length > 0 && (
         <SlideModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={handleSlideModalClose}
           slides={slides}
         />
       )}
@@ -337,7 +322,6 @@ export default function StudyClient({
           isOpen={isNextLessonModalOpen}
           onClose={() => setIsNextLessonModalOpen(false)}
           nextLesson={nextLesson}
-          nextCourse={nextCourse}
         />
       )}
     </Layout>

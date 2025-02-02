@@ -14,7 +14,7 @@ export const courseRepository = {
       .order('created_at', { ascending: false })
 
     if (error) throw error
-    return data
+    return data || []
   },
 
   async getCourseById(courseId: string) {
@@ -37,7 +37,7 @@ export const courseRepository = {
       .order('created_at', { ascending: false })
 
     if (error) throw error
-    return data
+    return data || []
   },
 
   async getFeaturedCourses() {
@@ -50,7 +50,7 @@ export const courseRepository = {
       .limit(3)
 
     if (error) throw error
-    return data
+    return data || []
   }
 }
 
@@ -63,7 +63,7 @@ export const lessonRepository = {
       .order('order_index', { ascending: true })
 
     if (error) throw error
-    return data
+    return data || []
   },
 
   async getLessonById(lessonId: string) {
@@ -81,51 +81,38 @@ export const lessonRepository = {
   },
 
   async getNextLesson(currentLessonId: string) {
-    // 現在のレッスンを取得して、そのコースIDとorder_indexを取得
-    const { data: currentLesson, error: currentError } = await supabase
-      .from('lessons')
-      .select('*')
-      .eq('id', currentLessonId)
-      .single()
+    try {
+      // 現在のレッスンを取得
+      const { data: currentLesson, error: currentError } = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('id', currentLessonId)
+        .single()
 
-    if (currentError) throw currentError
-    if (!currentLesson) throw new Error('Lesson not found')
+      if (currentError || !currentLesson) {
+        console.error('Error getting current lesson:', currentError)
+        return null
+      }
 
-    // 同じコース内で、現在のorder_indexより大きい最初のレッスンを取得
-    const { data: nextLesson, error: nextError } = await supabase
-      .from('lessons')
-      .select('*')
-      .eq('course_id', currentLesson.course_id)
-      .gt('order_index', currentLesson.order_index)
-      .order('order_index', { ascending: true })
-      .limit(1)
-      .single()
+      // 次のレッスンを取得
+      const { data: nextLessons, error: nextError } = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('course_id', currentLesson.course_id)
+        .gt('order_index', currentLesson.order_index)
+        .order('order_index')
+        .limit(1)
 
-    if (nextError && nextError.code !== 'PGRST116') throw nextError // PGRST116 は "結果が見つからない" エラー
-    return nextLesson || null
-  },
+      if (nextError) {
+        console.error('Error getting next lesson:', nextError)
+        return null
+      }
 
-  async getNextCourse(currentCourseId: string) {
-    // 現在のコースを取得して、そのcreated_atを取得
-    const { data: currentCourse, error: currentError } = await supabase
-      .from('courses')
-      .select('*')
-      .eq('id', currentCourseId)
-      .single()
+      return nextLessons?.[0] || null
 
-    if (currentError) throw currentError
-    if (!currentCourse) throw new Error('Course not found')
-
-    // 現在のコースより新しい（created_atが大きい）最初のコースを取得
-    const { data: nextCourse, error: nextError } = await supabase
-      .from('courses')
-      .select('*')
-      .gt('created_at', currentCourse.created_at)
-      .order('created_at', { ascending: true })
-      .limit(1)
-      .single()
-
-    if (nextError && nextError.code !== 'PGRST116') throw nextError // PGRST116 は "結果が見つからない" エラー
-    return nextCourse || null
+    } catch (error) {
+      console.error('Error in getNextLesson:', error)
+      return null
+    }
   }
 }

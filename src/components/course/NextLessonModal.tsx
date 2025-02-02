@@ -1,71 +1,50 @@
 "use client";
 
-import Link from "next/link";
+import type { Database } from "@/database.types";
 
-interface Lesson {
-  id: string;
-  title: string;
-}
-
-interface Course {
-  id: string;
-  title: string;
-}
+type Lesson = Database["public"]["Tables"]["lessons"]["Row"] & {
+  course?: Database["public"]["Tables"]["courses"]["Row"] | null;
+};
 
 interface NextLessonModalProps {
   isOpen: boolean;
   onClose: () => void;
-  nextLesson: Lesson | null;
-  nextCourse: Course | null;
+  nextLesson: Lesson;
 }
 
 export default function NextLessonModal({
   isOpen,
   onClose,
   nextLesson,
-  nextCourse,
 }: NextLessonModalProps) {
   if (!isOpen) return null;
 
+  const handleNextLesson = () => {
+    window.location.href = `/study?lessonId=${nextLesson.id}`;
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4">
-          {nextLesson ? "次のレッスンへ進みましょう！" : "コース完了！"}
-        </h2>
-
-        {nextLesson ? (
-          <>
-            <p className="mb-4">次のレッスン: {nextLesson.title}</p>
-            <Link
-              href={`/study/${nextLesson.id}`}
-              className="block w-full bg-[#19c37d] text-white text-center py-3 rounded-lg hover:bg-[#1a8870] transition-colors"
-            >
-              次のレッスンへ
-            </Link>
-          </>
-        ) : nextCourse ? (
-          <>
-            <p className="mb-4">次のコース: {nextCourse.title}</p>
-            <Link
-              href={`/courses/${nextCourse.id}`}
-              className="block w-full bg-[#19c37d] text-white text-center py-3 rounded-lg hover:bg-[#1a8870] transition-colors"
-            >
-              次のコースへ
-            </Link>
-          </>
-        ) : (
-          <p className="mb-4">
-            全てのコースを完了しました！おめでとうございます！
-          </p>
-        )}
-
-        <button
-          onClick={onClose}
-          className="mt-4 w-full border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          閉じる
-        </button>
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div className="w-[90%] max-w-lg bg-white rounded-lg p-6 md:p-8">
+        <h2 className="text-2xl font-bold mb-4">次のレッスン</h2>
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold mb-2">{nextLesson.title}</h3>
+          <p className="text-gray-600">{nextLesson.description || "説明がありません"}</p>
+        </div>
+        <div className="flex justify-end gap-4">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+          >
+            後で
+          </button>
+          <button
+            onClick={handleNextLesson}
+            className="px-6 py-2 bg-[#19c37d] text-white rounded-lg hover:bg-[#1a8870] transition-colors"
+          >
+            次のレッスンへ進む
+          </button>
+        </div>
       </div>
     </div>
   );
