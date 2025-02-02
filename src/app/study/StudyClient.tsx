@@ -151,7 +151,7 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
       <div className="flex flex-col md:flex-row h-[calc(100vh-64px)] relative">
         {/* 左側:説明エリア */}
         <div className="w-full md:w-[30%] lg:w-[20%] bg-gray-50 flex flex-col">
-          <div className="flex-1 p-4 md:p-6 overflow-y-scroll">
+          <div className="flex-1 p-4 md:p-6 overflow-hidden">
             <div className="max-w-2xl mx-auto">
               <h1 className="text-xl md:text-2xl font-bold mb-4">
                 {lesson.title}
@@ -249,9 +249,12 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
                 placeholder="分析結果を入力してください..."
                 style={{ minHeight: "44px", maxHeight: "200px" }}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit(e);
+                  if (e.key === "Enter") {
+                    if (e.shiftKey) {
+                      if (!input.trim() || isStreaming) return;
+                      e.preventDefault();
+                      handleSubmit(e);
+                    }
                   }
                 }}
                 disabled={isStreaming}
@@ -276,7 +279,7 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
               </button>
             </form>
             <div className="max-w-3xl mx-auto mt-2 text-xs text-center text-gray-500">
-              Enterキーで送信 / Shift + Enterで改行
+              Shift + Enterキーで送信 / Enterで改行
             </div>
           </div>
         </div>

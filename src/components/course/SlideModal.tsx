@@ -56,14 +56,14 @@ export default function SlideModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className={`w-[98%] h-[calc(100vh-32px)] md:h-[800px] rounded-lg relative bg-[#1e1e1e] text-white`}>
+      <div className={`w-[98%] h-[90vh] md:h-[800px] rounded-lg relative bg-[#1e1e1e] text-white`}>
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 md:top-4 md:right-4 text-current hover:text-gray-600 z-10"
+          className="absolute top-2 right-2 md:top-4 md:right-4 text-current hover:text-gray-600 z-10 p-2 md:p-0"
         >
           <svg
-            className="w-5 h-5 md:w-6 md:h-6"
+            className="w-6 h-6 md:w-6 md:h-6"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -87,7 +87,7 @@ export default function SlideModal({
                 animate={transitions.slide.animate}
                 exit={transitions.slide.exit}
                 transition={{ duration: 0.1, ease: "easeInOut" }}
-                className="h-full items-start flex justify-center p-8 md:p-12"
+                className="h-full items-start flex justify-center p-4 md:p-12"
               >
                 <div className="w-full max-w-6xl">{renderSlideContent()}</div>
               </motion.div>
@@ -95,10 +95,10 @@ export default function SlideModal({
           </div>
 
           {/* Navigation buttons */}
-          <div className="flex justify-between px-4 md:px-8 py-4 md:py-6 border-t border-gray-200 dark:border-gray-700 bg-inherit">
+          <div className="flex justify-between items-center px-4 md:px-8 py-4 md:py-6 border-t border-gray-200 dark:border-gray-700 bg-inherit">
             <button
               onClick={() => setCurrentSlide(currentSlide - 1)}
-              className={`p-2 rounded text-sm md:text-base ${
+              className={`p-3 md:p-2 rounded text-base md:text-base ${
                 currentSlide === 0
                   ? "text-gray-400 cursor-not-allowed"
                   : "text-current hover:bg-gray-200/20"
@@ -107,7 +107,7 @@ export default function SlideModal({
             >
               ← 前へ
             </button>
-            <div className="text-current text-sm md:text-base">
+            <div className="text-current text-base md:text-base">
               {currentSlide + 1} / {slides.slide.length}
             </div>
             <button
@@ -118,7 +118,8 @@ export default function SlideModal({
                   setCurrentSlide(currentSlide + 1);
                 }
               }}
-              className="p-2 rounded text-current hover:bg-gray-200/20 text-sm md:text-base"
+              className="p-3 md:p-2 rounded text-current hover:bg-gray-200/20 text-base md:text-base"
+              disabled={isLastSlide}
             >
               {isLastSlide ? "演習に進む →" : "次へ →"}
             </button>
