@@ -1,7 +1,6 @@
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { courseRepository } from "@/lib/supabase/client";
-import type { Database } from "@/database.types";
 import Image from "next/image";
 
 export async function generateStaticProps() {
