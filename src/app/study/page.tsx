@@ -42,10 +42,10 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
         images: [lesson?.course?.thumbnail_url || "/images/lesson-icon.png"],
       },
     };
-  } catch (error) {
+  } catch {
     return {
-      title: "レッスン",
-      description: "プロンプト学習のレッスンページです",
+      title: "GPT DOJO | プロンプトページ",
+      description: "プロンプト学習のプロンプトページです",
     };
   }
 }
