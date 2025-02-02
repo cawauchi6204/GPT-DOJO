@@ -1,10 +1,8 @@
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
-import type { Database } from "@/database.types";
 import Image from "next/image";
 import { courseRepository } from "@/lib/supabase/client";
 
-type Course = Database["public"]["Tables"]["courses"]["Row"];
 
 // サーバーコンポーネントとしてデータフェッチを行う
 export default async function Home() {
