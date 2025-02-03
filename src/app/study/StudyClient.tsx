@@ -9,6 +9,8 @@ import type { Database } from "@/database.types";
 import { lessonRepository } from "@/lib/supabase/client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import Link from "next/link";
+import Image from "next/image";
 
 type Message = {
   id: string;
@@ -177,20 +179,15 @@ export default function StudyClient({
         {/* パンくずリスト */}
         <div className="h-12 bg-white border-b border-gray-200 flex items-center px-4">
           <div className="flex items-center space-x-2 text-sm">
-            <span className="text-gray-600">プロンプトエンジニアリング</span>
-            <svg
-              className="w-4 h-4 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
+          <Link
+          href="/"
+          className="mr-2 flex items-center text-xl md:text-2xl font-bold text-gray-900 hover:text-gray-700 transition-colors"
+        >
+          <span>
+            GPT Dojo
+            </span>
+          <Image src="/images/dog_mono.png" alt="GPT Dojo" width={50} height={50} className="ml-2 mb-2" />
+        </Link>
             <span className="text-gray-600">{lesson.course?.title}</span>
             <svg
               className="w-4 h-4 text-gray-400"
