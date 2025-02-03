@@ -29,7 +29,11 @@ interface StudyClientProps {
   };
 }
 
-export default function StudyClient({ lesson, slides, error }: StudyClientProps) {
+export default function StudyClient({
+  lesson,
+  slides,
+  error,
+}: StudyClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [isNextLessonModalOpen, setIsNextLessonModalOpen] = useState(false);
   const [nextLesson, setNextLesson] = useState<Lesson | null>(null);
@@ -48,7 +52,7 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
 
   useEffect(() => {
     if (lesson) {
-      lessonRepository.getNextLesson(lesson.id).then(nextLesson => {
+      lessonRepository.getNextLesson(lesson.id).then((nextLesson) => {
         setNextLesson(nextLesson);
       });
     }
@@ -185,38 +189,76 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
                       remarkPlugins={[remarkGfm]}
                       className="text-sm md:text-base"
                       components={{
-                        p: ({...props}) => <p className="mb-4 last:mb-0" {...props} />,
-                        h1: ({...props}) => <h1 className="text-2xl font-bold mb-4" {...props} />,
-                        h2: ({...props}) => <h2 className="text-xl font-bold mb-3" {...props} />,
-                        h3: ({...props}) => <h3 className="text-lg font-bold mb-2" {...props} />,
-                        ul: ({...props}) => <ul className="list-disc pl-6 mb-4" {...props} />,
-                        ol: ({...props}) => <ol className="list-decimal pl-6 mb-4" {...props} />,
-                        li: ({...props}) => <li className="mb-1" {...props} />,
-                        code: ({className, children, ...props}) => {
-                          const match = /language-(\w+)/.exec(className || '');
+                        p: ({ ...props }) => (
+                          <p className="mb-4 last:mb-0" {...props} />
+                        ),
+                        h1: ({ ...props }) => (
+                          <h1 className="text-2xl font-bold mb-4" {...props} />
+                        ),
+                        h2: ({ ...props }) => (
+                          <h2 className="text-xl font-bold mb-3" {...props} />
+                        ),
+                        h3: ({ ...props }) => (
+                          <h3 className="text-lg font-bold mb-2" {...props} />
+                        ),
+                        ul: ({ ...props }) => (
+                          <ul className="list-disc pl-6 mb-4" {...props} />
+                        ),
+                        ol: ({ ...props }) => (
+                          <ol className="list-decimal pl-6 mb-4" {...props} />
+                        ),
+                        li: ({ ...props }) => (
+                          <li className="mb-1" {...props} />
+                        ),
+                        code: ({ className, children, ...props }) => {
+                          const match = /language-(\w+)/.exec(className || "");
                           const isInline = !match;
                           return isInline ? (
-                            <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm whitespace-normal break-words" {...props}>
+                            <code
+                              className="bg-gray-100 px-1.5 py-0.5 rounded text-sm whitespace-normal break-words"
+                              {...props}
+                            >
                               {children}
                             </code>
                           ) : (
-                            <code className="block bg-gray-100 p-4 rounded-lg mb-4 whitespace-pre-wrap break-words" {...props}>
+                            <code
+                              className="block bg-gray-100 p-4 rounded-lg mb-4 whitespace-pre-wrap break-words"
+                              {...props}
+                            >
                               {children}
                             </code>
                           );
                         },
-                        pre: ({...props}) => (
-                          <pre className="bg-gray-100 p-4 rounded-lg mb-4 overflow-x-auto break-all" {...props} />
+                        pre: ({ ...props }) => (
+                          <pre
+                            className="bg-gray-100 p-4 rounded-lg mb-4 overflow-x-auto break-all"
+                            {...props}
+                          />
                         ),
-                        blockquote: ({...props}) => (
-                          <blockquote className="border-l-4 border-gray-300 pl-4 italic mb-4" {...props} />
+                        blockquote: ({ ...props }) => (
+                          <blockquote
+                            className="border-l-4 border-gray-300 pl-4 italic mb-4"
+                            {...props}
+                          />
                         ),
                       }}
                     >
-                      {lesson.content || ''}
+                      {lesson.content || ""}
                     </ReactMarkdown>
                   </div>
                 </div>
+
+                {/* できた!ボタンを追加 */}
+                <button
+                  className="w-full mt-6 bg-[#19c37d] text-white py-3 rounded-lg hover:bg-[#1a8870] transition-colors font-bold"
+                  onClick={() => {
+                    if (nextLesson) {
+                      setIsNextLessonModalOpen(true);
+                    }
+                  }}
+                >
+                  できた!
+                </button>
               </div>
             </div>
           </div>
