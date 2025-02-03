@@ -1,4 +1,3 @@
-import { Metadata } from "next";
 import { lessonRepository } from "@/lib/supabase/client";
 import { slideRepository } from "@/lib/microcms/client";
 import StudyClient from "@/app/study/StudyClient";
@@ -6,49 +5,6 @@ import StudyClient from "@/app/study/StudyClient";
 type Props = {
   searchParams: { lessonId?: string };
 };
-
-export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  if (!searchParams.lessonId) {
-    return {
-      title: "GPT DOJO | プロンプトページ",
-      description: "プロンプト学習のプロンプトページです",
-    };
-  }
-
-  try {
-    const lesson = await lessonRepository.getLessonById(searchParams.lessonId);
-    return {
-      title: lesson?.title || "レッスン",
-      description: lesson?.description || "プロンプト学習のレッスンページです",
-      openGraph: {
-        title: lesson?.title || "レッスン",
-        description: lesson?.description || "プロンプト学習のレッスンページです",
-        images: [
-          {
-            url: lesson?.course?.thumbnail_url || "/images/lesson-icon.png",
-            width: 1200,
-            height: 630,
-            alt: lesson?.title || "レッスン",
-          },
-        ],
-        type: "article",
-        siteName: "GPT DOJO",
-        locale: "ja_JP",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: lesson?.title || "レッスン",
-        description: lesson?.description || "プロンプト学習のレッスンページです",
-        images: [lesson?.course?.thumbnail_url || "/images/lesson-icon.png"],
-      },
-    };
-  } catch {
-    return {
-      title: "GPT DOJO | プロンプトページ",
-      description: "プロンプト学習のプロンプトページです",
-    };
-  }
-}
 
 export const revalidate = 0; // キャッシュを無効化
 

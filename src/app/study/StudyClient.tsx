@@ -156,7 +156,7 @@ export default function StudyClient({
 
   if (error) {
     return (
-      <Layout hideFooter={true}>
+      <Layout hideHeader={true} hideFooter={true}>
         <div className="flex justify-center items-center min-h-screen">
           <div className="text-red-600">
             <h2 className="text-2xl font-bold mb-2">{error.title}</h2>
@@ -172,8 +172,8 @@ export default function StudyClient({
   }
 
   return (
-    <Layout hideFooter={true}>
-      <div className="flex flex-col h-screen">
+    <Layout hideHeader={true} hideFooter={true}>
+      <div className="flex flex-col h-screen overflow-hidden">
         {/* パンくずリスト */}
         <div className="h-12 bg-white border-b border-gray-200 flex items-center px-4">
           <div className="flex items-center space-x-2 text-sm">
@@ -209,7 +209,7 @@ export default function StudyClient({
           </div>
         </div>
         {/* メインコンテンツ */}
-        <div className="flex flex-col md:flex-row flex-1">
+        <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
           {/* 左側:説明エリア */}
           <div className="h-[40%] md:h-auto w-full md:w-[30%] bg-gray-50 flex flex-col overflow-y-auto">
             <div className="flex-1 p-4 md:p-6">
@@ -339,7 +339,7 @@ export default function StudyClient({
           </div>
 
           {/* 右側:ChatGPTスタイルのインターフェース */}
-          <div className="h-[60%] md:h-auto w-full md:w-[70%] flex-1 bg-[#1a1a1a] flex flex-col overflow-y-scroll [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <div className="h-[60%] md:h-auto w-full md:w-[70%] flex-1 bg-[#1a1a1a] flex flex-col overflow-hidden">
             {/* メッセージ表示エリア */}
             <div className="flex-[2] md:flex-1 overflow-y-auto p-3 md:p-4">
               <div className="max-w-3xl mx-auto space-y-4">

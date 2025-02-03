@@ -1,4 +1,3 @@
-import { Metadata } from "next";
 import { courseRepository, lessonRepository } from "@/lib/supabase/client";
 import Layout from "@/components/layout/Layout";
 import type { Database } from "@/database.types";
@@ -8,36 +7,6 @@ type Props = {
 };
 
 type Lesson = Database["public"]["Tables"]["lessons"]["Row"];
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const course = await courseRepository.getCourseById(params.id);
-
-  return {
-    title: course?.title || "コース詳細",
-    description: course?.description || "コースの詳細ページです",
-    openGraph: {
-      title: course?.title || "コース詳細",
-      description: course?.description || "コースの詳細ページです",
-      images: [
-        {
-          url: course?.thumbnail_url || "/images/lesson-icon.png",
-          width: 1200,
-          height: 630,
-          alt: course?.title || "コース詳細",
-        },
-      ],
-      type: "website",
-      siteName: "GPT DOJO",
-      locale: "ja_JP",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: course?.title || "コース詳細",
-      description: course?.description || "コースの詳細ページです",
-      images: [course?.thumbnail_url || "/images/lesson-icon.png"],
-    },
-  };
-}
 
 export default async function CoursePage({ params }: Props) {
   const [course, lessons] = await Promise.all([
