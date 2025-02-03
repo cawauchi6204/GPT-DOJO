@@ -210,23 +210,42 @@ export default function StudyClient({
                         li: ({ ...props }) => (
                           <li className="mb-1" {...props} />
                         ),
-                        code: ({ className, children, ...props }) => {
-                          const match = /language-(\w+)/.exec(className || "");
-                          const isInline = !match;
-                          return isInline ? (
-                            <code
-                              className="bg-gray-100 px-1.5 py-0.5 rounded text-sm whitespace-normal break-words"
-                              {...props}
-                            >
-                              {children}
-                            </code>
-                          ) : (
-                            <code
-                              className="block bg-gray-100 p-4 rounded-lg mb-4 whitespace-pre-wrap break-words"
-                              {...props}
-                            >
-                              {children}
-                            </code>
+                        code: ({ children, ...props }) => {
+                          const handleCopy = (text: string) => {
+                            navigator.clipboard.writeText(text).then(() => {
+                              // オプション: コピー成功時のフィードバックを実装できます
+                            });
+                          };
+
+                          return (
+                            <div className="relative">
+                              <code
+                                className="block bg-gray-100 p-4 pr-12 rounded-lg mb-4 whitespace-pre-wrap break-words"
+                                {...props}
+                              >
+                                {children}
+                              </code>
+                              <button
+                                onClick={() => handleCopy(String(children))}
+                                className="absolute top-2 right-2 p-2 bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+                                aria-label="コードをコピー"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-5 w-5 text-gray-600"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+                                  />
+                                </svg>
+                              </button>
+                            </div>
                           );
                         },
                         pre: ({ ...props }) => (
@@ -248,10 +267,11 @@ export default function StudyClient({
                   </div>
                 </div>
 
-                {/* できた!ボタンを追加 */}
+                {/* できた!ボタン */}
                 <button
                   className="w-full mt-6 bg-[#19c37d] text-white py-3 rounded-lg hover:bg-[#1a8870] transition-colors font-bold"
                   onClick={() => {
+                    setIsModalOpen(false);
                     if (nextLesson) {
                       setIsNextLessonModalOpen(true);
                     }
