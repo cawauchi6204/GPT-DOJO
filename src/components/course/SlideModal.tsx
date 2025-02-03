@@ -36,7 +36,10 @@ export default function SlideModal({
         setCurrentSlide(currentSlide + 1);
       } else if (e.key === "ArrowLeft" && currentSlide > 0) {
         setCurrentSlide(currentSlide - 1);
-      } else if (e.key === "Enter" && currentSlide === slides.slide.length - 1) {
+      } else if (
+        e.key === "Enter" &&
+        currentSlide === slides.slide.length - 1
+      ) {
         onClose();
       }
     };
@@ -52,7 +55,7 @@ export default function SlideModal({
 
   const renderSlideContent = () => {
     return (
-      <div 
+      <div
         className="slide-content"
         dangerouslySetInnerHTML={{ __html: currentSlideData.content }}
       />
@@ -61,7 +64,9 @@ export default function SlideModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className={`w-[98%] h-[90vh] md:h-[800px] rounded-lg relative bg-white text-black`}>
+      <div
+        className={`w-[98%] h-[90vh] md:h-[800px] rounded-lg relative bg-white text-black`}
+      >
         {/* Close button */}
         <button
           onClick={onClose}
@@ -84,7 +89,7 @@ export default function SlideModal({
 
         {/* Slide content */}
         <div className="h-full flex flex-col">
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-scroll">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide}
@@ -92,7 +97,7 @@ export default function SlideModal({
                 animate={transitions.slide.animate}
                 exit={transitions.slide.exit}
                 transition={{ duration: 0.1, ease: "easeInOut" }}
-                className="h-full items-start flex justify-center p-4 md:p-12"
+                className="h-full items-start flex justify-center px-4 py-8 md:p-12"
               >
                 <div className="w-full max-w-6xl">{renderSlideContent()}</div>
               </motion.div>
