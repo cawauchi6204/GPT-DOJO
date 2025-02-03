@@ -50,6 +50,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   }
 }
 
+export const revalidate = 0; // キャッシュを無効化
+
 export default async function StudyPage({ searchParams }: Props) {
   if (!searchParams.lessonId) {
     return (
