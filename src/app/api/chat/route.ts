@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       messages: [
         {
           role: 'system',
-          content: 'あなたはプログラミング学習のメンターです。学習者の理解度を確認しながら、適切なアドバイスを提供してください。',
+          content: '',
         },
         ...messages,
       ],

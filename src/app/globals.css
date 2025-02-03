@@ -51,7 +51,12 @@
 }
 
 .slide-content code {
-  @apply font-mono text-base md:text-lg text-[#19c37d];
+  @apply font-mono text-base md:text-lg bg-[#1e1e1e] text-[#d4d4d4] px-2 py-1 rounded 
+  border border-[#333333] shadow-sm;
+}
+
+.slide-content pre code {
+  @apply bg-transparent border-none p-0 shadow-none;
 }
 
 .slide-content a {
