@@ -28,8 +28,8 @@ const geist = localFont({
 const defaultDescription = "GPT Dojoは、ChatGPTの使い方をハンズオン形式で学べるオンライン学習プラットフォームです。初心者から上級者まで、ステップバイステップで学習できます。";
 const defaultOgImage = {
   url: "/images/ogp.png",
-  width: 1200,
-  height: 630,
+  width: 800,
+  height: 600,
   alt: "GPT DOJO",
 };
 
