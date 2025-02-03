@@ -98,7 +98,7 @@ export const lessonRepository = {
       const { data: nextLessons, error: nextError } = await supabase
         .from('lessons')
         .select('*')
-        .eq('course_id', currentLesson.course_id)
+        .eq('course_id', currentLesson.course_id || '')
         .gt('order_index', currentLesson.order_index)
         .order('order_index')
         .limit(1)

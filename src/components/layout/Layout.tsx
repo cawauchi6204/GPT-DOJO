@@ -4,12 +4,13 @@ import Header from './Header';
 interface LayoutProps {
   children: ReactNode;
   hideFooter?: boolean;
+  hideHeader?: boolean;
 }
 
-export const Layout = ({ children, hideFooter = false }: LayoutProps) => {
+export const Layout = ({ children, hideFooter = false, hideHeader = false }: LayoutProps) => {
   return (
     <div className={`min-h-screen bg-gray-50 ${hideFooter ? 'overflow-hidden' : ''}`}>
-      <Header />
+      {!hideHeader && <Header />}
       <main className={`pt-16 ${hideFooter ? 'h-[calc(100vh-64px)]' : ''}`}>
         {children}
       </main>
