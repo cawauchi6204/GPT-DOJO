@@ -392,13 +392,19 @@ export default function StudyClient({
               >
                 <textarea
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    // テキストエリアの高さを動的に調整
+                    e.target.style.height = "auto";
+                    const newHeight = Math.min(e.target.scrollHeight, 132); // 132px = 2行(44px) + 3行分(88px)
+                    e.target.style.height = `${Math.max(44, newHeight)}px`; // 最小2行(44px)
+                  }}
                   className="w-full bg-[#2a2a2a] text-white rounded-lg pl-3 md:pl-4 pr-10 md:pr-12 py-2 md:py-3 resize-none border border-gray-700 focus:border-gray-500 focus:ring-0 focus:outline-none text-base"
-                  rows={1}
+                  rows={2}
                   placeholder="GPT DOJOが世の中で流行る方法を考えてください"
                   style={{
-                    minHeight: "44px",
-                    maxHeight: "200px",
+                    height: "44px", // 初期値は2行分
+                    maxHeight: "132px", // 最大5行分
                     fontSize: "16px",
                   }}
                   onKeyDown={(e) => {
