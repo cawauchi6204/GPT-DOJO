@@ -44,11 +44,6 @@ export default async function Courses() {
               <p className="text-sm md:text-base text-gray-600 mb-4">
                 {course.description}
               </p>
-              <div className="flex items-center justify-between">
-                <span className="text-sm md:text-base text-gray-500">
-                  {course.lesson_count}レッスン
-                </span>
-              </div>
             </Link>
           ))}
 
