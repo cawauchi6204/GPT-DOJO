@@ -30,6 +30,7 @@ export default function SlideModal({
 }: SlideModalProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // キーボードイベントのハンドリング
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight" && currentSlide < slides.slide.length - 1) {
@@ -47,6 +48,16 @@ export default function SlideModal({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [currentSlide, slides, onClose]);
+
+  // モーダルが開いているときにバックグラウンドのスクロールをロック
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
