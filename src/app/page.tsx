@@ -23,10 +23,10 @@ export default async function Home() {
               初心者から上級者まで、ステップバイステップで学習できます。
             </p>
             <Link
-              href="/courses"
+              href="/study?lessonId=6bd27ae7-ac04-46ce-a8ed-61e02a951040"
               className="inline-block bg-[#19c37d] text-white px-6 md:px-8 py-3 md:py-4 rounded-full text-lg md:text-xl font-semibold hover:bg-[#1a8870] transition-colors"
             >
-              コースを見る
+              体験してみる
             </Link>
           </div>
         </div>
@@ -122,10 +122,10 @@ export default async function Home() {
             今だけ完全無料のコースで、生成AIの学習を始めることができます。
           </p>
           <Link
-            href="/courses"
+            href="/study?lessonId=6bd27ae7-ac04-46ce-a8ed-61e02a951040"
             className="inline-block bg-[#19c37d] text-white px-6 md:px-8 py-3 md:py-4 rounded-full text-lg md:text-xl font-semibold hover:bg-[#1a8870] transition-colors"
           >
-            コースを見る
+            体験してみる
           </Link>
         </div>
       </div>
