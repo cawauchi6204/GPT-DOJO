@@ -205,7 +205,7 @@ export default function StudyClient({
                       li: ({ ...props }) => <li className="mb-1" {...props} />,
                       code: ({ children, ...props }) => {
                         const handleCopy = (text: string) => {
-                          navigator.clipboard.writeText(text).then(() => {
+                          navigator.clipboard.writeText(text.trimEnd()).then(() => {
                             // オプション: コピー成功時のフィードバックを実装できます
                           });
                         };
