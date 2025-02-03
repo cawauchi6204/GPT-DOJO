@@ -362,10 +362,10 @@ export default function StudyClient({
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                className="w-full bg-[#2a2a2a] text-white rounded-lg pl-3 md:pl-4 pr-10 md:pr-12 py-2 md:py-3 resize-none border border-gray-700 focus:border-gray-500 focus:ring-0 focus:outline-none text-sm md:text-base"
+                className="w-full bg-[#2a2a2a] text-white rounded-lg pl-3 md:pl-4 pr-10 md:pr-12 py-2 md:py-3 resize-none border border-gray-700 focus:border-gray-500 focus:ring-0 focus:outline-none text-base"
                 rows={1}
                 placeholder="GPT DOJOが世の中で流行る方法を考えてください"
-                style={{ minHeight: "44px", maxHeight: "200px" }}
+                style={{ minHeight: "44px", maxHeight: "200px", fontSize: "16px" }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     if (e.shiftKey) {
