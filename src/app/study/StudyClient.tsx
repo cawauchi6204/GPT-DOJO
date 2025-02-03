@@ -7,6 +7,8 @@ import NextLessonModal from "@/components/course/NextLessonModal";
 import type { Slides } from "@/types/microcms";
 import type { Database } from "@/database.types";
 import { lessonRepository } from "@/lib/supabase/client";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type Message = {
   id: string;
@@ -178,10 +180,42 @@ export default function StudyClient({ lesson, slides, error }: StudyClientProps)
               <div className="prose prose-sm md:prose">
                 <p className="mb-4">{lesson.description}</p>
                 <div className="mt-6 md:mt-8 p-3 md:p-4 bg-gray-100 rounded-lg">
-                  <h2 className="font-semibold mb-2">見本</h2>
-                  <code className="block bg-white p-2 md:p-3 rounded text-sm md:text-base">
-                    {lesson.content}
-                  </code>
+                  <div className="bg-white p-2 md:p-3 rounded">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      className="text-sm md:text-base"
+                      components={{
+                        p: ({...props}) => <p className="mb-4 last:mb-0" {...props} />,
+                        h1: ({...props}) => <h1 className="text-2xl font-bold mb-4" {...props} />,
+                        h2: ({...props}) => <h2 className="text-xl font-bold mb-3" {...props} />,
+                        h3: ({...props}) => <h3 className="text-lg font-bold mb-2" {...props} />,
+                        ul: ({...props}) => <ul className="list-disc pl-6 mb-4" {...props} />,
+                        ol: ({...props}) => <ol className="list-decimal pl-6 mb-4" {...props} />,
+                        li: ({...props}) => <li className="mb-1" {...props} />,
+                        code: ({className, children, ...props}) => {
+                          const match = /language-(\w+)/.exec(className || '');
+                          const isInline = !match;
+                          return isInline ? (
+                            <code className="bg-gray-100 px-1.5 py-0.5 rounded text-sm whitespace-normal break-words" {...props}>
+                              {children}
+                            </code>
+                          ) : (
+                            <code className="block bg-gray-100 p-4 rounded-lg mb-4 whitespace-pre-wrap break-words" {...props}>
+                              {children}
+                            </code>
+                          );
+                        },
+                        pre: ({...props}) => (
+                          <pre className="bg-gray-100 p-4 rounded-lg mb-4 overflow-x-auto break-all" {...props} />
+                        ),
+                        blockquote: ({...props}) => (
+                          <blockquote className="border-l-4 border-gray-300 pl-4 italic mb-4" {...props} />
+                        ),
+                      }}
+                    >
+                      {lesson.content || ''}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               </div>
             </div>
