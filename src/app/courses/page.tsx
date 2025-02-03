@@ -1,7 +1,13 @@
+import { Metadata } from "next";
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { courseRepository } from "@/lib/supabase/client";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "コース一覧",
+  description: "GPT DOJOで提供している全てのコースの一覧です。プロンプトエンジニアリングを学んで、AIを味方につけましょう。",
+};
 
 async function fetchCourses() {
   try {

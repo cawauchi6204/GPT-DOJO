@@ -1,6 +1,29 @@
+import { Metadata } from "next";
 import { lessonRepository } from "@/lib/supabase/client";
 import { slideRepository } from "@/lib/microcms/client";
 import StudyClient from "@/app/study/StudyClient";
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  if (!searchParams.lessonId) {
+    return {
+      title: "プロンプトページ",
+      description: "プロンプト学習のプロンプトページです",
+    };
+  }
+
+  try {
+    const lesson = await lessonRepository.getLessonById(searchParams.lessonId);
+    return {
+      title: lesson?.title || "レッスン",
+      description: lesson?.description || "プロンプト学習のレッスンページです",
+    };
+  } catch {
+    return {
+      title: "プロンプトページ",
+      description: "プロンプト学習のプロンプトページです",
+    };
+  }
+}
 
 type Props = {
   searchParams: { lessonId?: string };

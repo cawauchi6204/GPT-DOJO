@@ -1,6 +1,30 @@
+import { Metadata } from "next";
 import { courseRepository, lessonRepository } from "@/lib/supabase/client";
 import Layout from "@/components/layout/Layout";
 import type { Database } from "@/database.types";
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  try {
+    const course = await courseRepository.getCourseById(params.id);
+    
+    if (!course) {
+      return {
+        title: "コースが見つかりません",
+        description: "指定されたコースは存在しないか、削除された可能性があります。",
+      };
+    }
+
+    return {
+      title: course.title,
+      description: course.description || "GPT DOJOのコースです",
+    };
+  } catch {
+    return {
+      title: "エラー",
+      description: "コースの読み込み中にエラーが発生しました。",
+    };
+  }
+}
 
 type Props = {
   params: { id: string };

@@ -25,35 +25,36 @@ const geist = localFont({
   variable: "--font-geist",
 });
 
+const defaultDescription = "GPT Dojoは、ChatGPTの使い方をハンズオン形式で学べるオンライン学習プラットフォームです。初心者から上級者まで、ステップバイステップで学習できます。";
+const defaultOgImage = {
+  url: "/images/ogp.png",
+  width: 1200,
+  height: 630,
+  alt: "GPT DOJO",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: {
-    default: "GPT DOJO",
+    default: "GPT DOJO - 今日から生成AIを味方にしよう",
     template: "%s | GPT DOJO",
   },
-  description: "今日から生成AIを味方にするためのプラットフォームGPT DOJO",
+  description: defaultDescription,
   keywords: ["プロンプト", "プロンプトエンジニアリング", "学習", "AI", "GPT", "教育"],
   authors: [{ name: "GPT DOJO Team" }],
   openGraph: {
     type: "website",
     siteName: "GPT DOJO",
-    title: "GPT DOJO",
-    description: "AIを活用したプログラミング学習プラットフォーム",
-    images: [
-      {
-        url: "/images/ogp.png",
-        width: 1200,
-        height: 630,
-        alt: "GPT DOJO",
-      },
-    ],
+    title: "GPT DOJO - 今日から生成AIを味方にしよう",
+    description: defaultDescription,
+    images: [defaultOgImage],
     locale: "ja_JP",
   },
   twitter: {
     card: "summary_large_image",
-    title: "GPT DOJO",
-    description: "今日から生成AIを味方にするためのプラットフォームGPT DOJO",
-    images: ["/images/ogp.png"],
+    title: "GPT DOJO - 今日から生成AIを味方にしよう",
+    description: defaultDescription,
+    images: [defaultOgImage.url],
     creator: "@gptdojo",
   },
   robots: {
