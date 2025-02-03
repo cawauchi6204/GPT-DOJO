@@ -11,6 +11,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
 import Image from "next/image";
+import ReactConfetti from 'react-confetti';
 
 type Message = {
   id: string;
@@ -38,6 +39,7 @@ export default function StudyClient({
 }: StudyClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [isNextLessonModalOpen, setIsNextLessonModalOpen] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
   const [nextLesson, setNextLesson] = useState<Lesson | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -71,6 +73,16 @@ export default function StudyClient({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isModalOpen]);
+
+  // 花吹雪を3秒後に消すための useEffect
+  useEffect(() => {
+    if (showConfetti) {
+      const timer = setTimeout(() => {
+        setShowConfetti(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showConfetti]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,9 +163,6 @@ export default function StudyClient({
 
   const handleSlideModalClose = () => {
     setIsModalOpen(false);
-    if (nextLesson) {
-      setIsNextLessonModalOpen(true);
-    }
   };
 
   if (error) {
@@ -175,6 +184,24 @@ export default function StudyClient({
 
   return (
     <Layout hideHeader={true} hideFooter={true}>
+      {showConfetti && (
+        <ReactConfetti
+          style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1000 }}
+          numberOfPieces={200}
+          recycle={false}
+          colors={['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff']}
+          initialVelocityX={20}
+          initialVelocityY={10}
+          gravity={0.3}
+          wind={0}
+          confettiSource={{
+            x: 0,
+            y: window.innerHeight / 2,
+            w: window.innerWidth,
+            h: 0
+          }}
+        />
+      )}
       <div className="flex flex-col h-screen overflow-hidden">
         {/* パンくずリスト */}
         <div className="h-12 bg-white border-b border-gray-200 flex items-center px-4">
@@ -301,6 +328,7 @@ export default function StudyClient({
                 <button
                   className="w-full mt-6 bg-[#19c37d] text-white py-3 rounded-lg hover:bg-[#1a8870] transition-colors font-bold"
                   onClick={() => {
+                    setShowConfetti(true);
                     setIsModalOpen(false);
                     if (nextLesson) {
                       setIsNextLessonModalOpen(true);
