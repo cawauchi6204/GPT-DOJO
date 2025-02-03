@@ -178,108 +178,100 @@ export default function StudyClient({
         <div className="h-[40%] md:h-auto w-full md:w-[30%] bg-gray-50 flex flex-col overflow-y-auto">
           <div className="flex-1 p-4 md:p-6">
             <div className="max-w-2xl mx-auto">
-              <h1 className="text-xl md:text-2xl font-bold mb-4">
-                {lesson.title}
-              </h1>
               <div className="prose prose-sm md:prose">
-                <p className="mb-4">{lesson.description}</p>
-                <div className="mt-6 md:mt-8 p-3 md:p-4 bg-gray-100 rounded-lg">
-                  <div className="bg-white p-2 md:p-3 rounded">
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
-                      className="text-sm md:text-base"
-                      components={{
-                        p: ({ ...props }) => (
-                          <p className="mb-4 last:mb-0" {...props} />
-                        ),
-                        h1: ({ ...props }) => (
-                          <h1 className="text-2xl font-bold mb-4" {...props} />
-                        ),
-                        h2: ({ ...props }) => (
-                          <h2 className="text-xl font-bold mb-3" {...props} />
-                        ),
-                        h3: ({ ...props }) => (
-                          <h3 className="text-lg font-bold mb-2" {...props} />
-                        ),
-                        ul: ({ ...props }) => (
-                          <ul className="list-disc pl-6 mb-4" {...props} />
-                        ),
-                        ol: ({ ...props }) => (
-                          <ol className="list-decimal pl-6 mb-4" {...props} />
-                        ),
-                        li: ({ ...props }) => (
-                          <li className="mb-1" {...props} />
-                        ),
-                        code: ({ children, ...props }) => {
-                          const handleCopy = (text: string) => {
-                            navigator.clipboard.writeText(text).then(() => {
-                              // オプション: コピー成功時のフィードバックを実装できます
-                            });
-                          };
+                <div className="bg-white p-2 md:p-3 rounded">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    className="text-sm md:text-base"
+                    components={{
+                      p: ({ ...props }) => (
+                        <p className="mb-4 last:mb-0" {...props} />
+                      ),
+                      h1: ({ ...props }) => (
+                        <h1 className="text-2xl font-bold mb-4" {...props} />
+                      ),
+                      h2: ({ ...props }) => (
+                        <h2 className="text-xl font-bold mb-3" {...props} />
+                      ),
+                      h3: ({ ...props }) => (
+                        <h3 className="text-lg font-bold mb-2" {...props} />
+                      ),
+                      ul: ({ ...props }) => (
+                        <ul className="list-disc pl-6 mb-4" {...props} />
+                      ),
+                      ol: ({ ...props }) => (
+                        <ol className="list-decimal pl-6 mb-4" {...props} />
+                      ),
+                      li: ({ ...props }) => <li className="mb-1" {...props} />,
+                      code: ({ children, ...props }) => {
+                        const handleCopy = (text: string) => {
+                          navigator.clipboard.writeText(text).then(() => {
+                            // オプション: コピー成功時のフィードバックを実装できます
+                          });
+                        };
 
-                          return (
-                            <div className="relative">
-                              <code
-                                className="block bg-gray-100 p-4 rounded-lg mb-4 whitespace-pre-wrap break-words"
-                                {...props}
+                        return (
+                          <div className="relative">
+                            <code
+                              className="block bg-gray-100 p-4 rounded-lg mb-4 whitespace-pre-wrap break-words"
+                              {...props}
+                            >
+                              {children}
+                            </code>
+                            <button
+                              onClick={() => handleCopy(String(children))}
+                              className="absolute top-2 right-2 p-2 bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+                              aria-label="コードをコピー"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5 text-gray-600"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
                               >
-                                {children}
-                              </code>
-                              <button
-                                onClick={() => handleCopy(String(children))}
-                                className="absolute top-2 right-2 p-2 bg-gray-200 hover:bg-gray-300 rounded transition-colors"
-                                aria-label="コードをコピー"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5 text-gray-600"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-                          );
-                        },
-                        pre: ({ ...props }) => (
-                          <pre
-                            className="bg-gray-100 p-4 rounded-lg mb-4 overflow-x-auto break-all"
-                            {...props}
-                          />
-                        ),
-                        blockquote: ({ ...props }) => (
-                          <blockquote
-                            className="border-l-4 border-gray-300 pl-4 italic mb-4"
-                            {...props}
-                          />
-                        ),
-                      }}
-                    >
-                      {lesson.content || ""}
-                    </ReactMarkdown>
-                  </div>
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        );
+                      },
+                      pre: ({ ...props }) => (
+                        <pre
+                          className="bg-gray-100 p-4 rounded-lg mb-4 overflow-x-auto break-all"
+                          {...props}
+                        />
+                      ),
+                      blockquote: ({ ...props }) => (
+                        <blockquote
+                          className="border-l-4 border-gray-300 pl-4 italic mb-4"
+                          {...props}
+                        />
+                      ),
+                    }}
+                  >
+                    {lesson.content || ""}
+                  </ReactMarkdown>
                 </div>
-
-                {/* できた!ボタン */}
-                <button
-                  className="w-full mt-6 bg-[#19c37d] text-white py-3 rounded-lg hover:bg-[#1a8870] transition-colors font-bold"
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    if (nextLesson) {
-                      setIsNextLessonModalOpen(true);
-                    }
-                  }}
-                >
-                  できた!
-                </button>
               </div>
+
+              {/* できた!ボタン */}
+              <button
+                className="w-full mt-6 bg-[#19c37d] text-white py-3 rounded-lg hover:bg-[#1a8870] transition-colors font-bold"
+                onClick={() => {
+                  setIsModalOpen(false);
+                  if (nextLesson) {
+                    setIsNextLessonModalOpen(true);
+                  }
+                }}
+              >
+                できた!
+              </button>
             </div>
           </div>
 
@@ -365,7 +357,11 @@ export default function StudyClient({
                 className="w-full bg-[#2a2a2a] text-white rounded-lg pl-3 md:pl-4 pr-10 md:pr-12 py-2 md:py-3 resize-none border border-gray-700 focus:border-gray-500 focus:ring-0 focus:outline-none text-base"
                 rows={1}
                 placeholder="GPT DOJOが世の中で流行る方法を考えてください"
-                style={{ minHeight: "44px", maxHeight: "200px", fontSize: "16px" }}
+                style={{
+                  minHeight: "44px",
+                  maxHeight: "200px",
+                  fontSize: "16px",
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     if (e.shiftKey) {
