@@ -22,6 +22,9 @@ export default async function Home() {
               GPT Dojoは、ChatGPTの使い方をハンズオン形式で学べるオンライン学習プラットフォームです。
               初心者から上級者まで、ステップバイステップで学習できます。
             </p>
+            <p className="text-lg md:text-xl text-[#19c37d] font-semibold mb-2">
+              今なら完全無料
+            </p>
             <Link
               href="/study?lessonId=6bd27ae7-ac04-46ce-a8ed-61e02a951040"
               className="inline-block bg-[#19c37d] text-white px-6 md:px-8 py-3 md:py-4 rounded-full text-lg md:text-xl font-semibold hover:bg-[#1a8870] transition-colors"
