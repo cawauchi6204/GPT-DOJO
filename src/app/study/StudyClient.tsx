@@ -11,7 +11,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
 import Image from "next/image";
-import ReactConfetti from 'react-confetti';
+import ReactConfetti from "react-confetti";
 
 type Message = {
   id: string;
@@ -186,19 +186,26 @@ export default function StudyClient({
     <Layout hideHeader={true} hideFooter={true}>
       {showConfetti && (
         <ReactConfetti
-          style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1000 }}
-          numberOfPieces={200}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 1000,
+          }}
+          numberOfPieces={2200}
           recycle={false}
-          colors={['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff']}
+          colors={["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff"]}
           initialVelocityX={20}
           initialVelocityY={10}
           gravity={0.3}
           wind={0}
           confettiSource={{
             x: 0,
-            y: window.innerHeight / 2,
+            y: 0,
             w: window.innerWidth,
-            h: 0
+            h: 0,
           }}
         />
       )}
@@ -206,30 +213,36 @@ export default function StudyClient({
         {/* パンくずリスト */}
         <div className="h-12 bg-white border-b border-gray-200 flex items-center px-4">
           <div className="flex items-center space-x-2 text-sm">
-          <Link
-          href="/"
-          className="mr-2 flex items-center text-xl md:text-2xl font-bold text-gray-900 hover:text-gray-700 transition-colors"
-        >
-          <span>
-            GPT Dojo
-            </span>
-          <Image src="/images/dog_mono.png" alt="GPT Dojo" width={50} height={50} className="ml-2 mb-2" />
-        </Link>
-            <span className="text-gray-600">{lesson.course?.title}</span>
-            <svg
-              className="w-4 h-4 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            <Link
+              href="/"
+              className="mr-2 flex items-center text-xl md:text-2xl font-bold text-gray-900 hover:text-gray-700 transition-colors"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
+              <span>GPT Dojo</span>
+              <Image
+                src="/images/dog_mono.png"
+                alt="GPT Dojo"
+                width={50}
+                height={50}
+                className="ml-2 mb-2"
               />
-            </svg>
-            <span className="text-gray-900 font-medium">{lesson.title}</span>
+            </Link>
+            <div className="hidden md:flex items-center space-x-2">
+              <span className="text-gray-600">{lesson.course?.title}</span>
+              <svg
+                className="w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+              <span className="text-gray-900 font-medium">{lesson.title}</span>
+            </div>
           </div>
         </div>
         {/* メインコンテンツ */}

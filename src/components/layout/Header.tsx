@@ -16,14 +16,6 @@ export default function Header() {
 
         <nav>
           <ul className="flex items-center space-x-2 md:space-x-6">
-            {/* <li>
-              <Link
-                href="/dashboard"
-                className="text-sm md:text-base text-gray-600 hover:text-gray-900 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                ダッシュボード
-              </Link>
-            </li> */}
             <li>
               <Link
                 href="/courses"
@@ -32,14 +24,6 @@ export default function Header() {
                 コース一覧
               </Link>
             </li>
-            {/* <li>
-              <Link
-                href="/community"
-                className="text-sm md:text-base text-gray-600 hover:text-gray-900 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                コミュニティ
-              </Link>
-            </li> */}
           </ul>
         </nav>
       </div>
