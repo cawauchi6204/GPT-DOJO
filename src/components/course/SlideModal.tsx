@@ -29,55 +29,75 @@ export default function SlideModal({
   slides,
 }: SlideModalProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
+  // slides.slide の後に extra slide を追加
+  const totalSlides = slides.slide.length + 1;
+  const isLastSlide = currentSlide === totalSlides - 1;
 
   // キーボードイベントのハンドリング
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight" && currentSlide < slides.slide.length - 1) {
-        setCurrentSlide(currentSlide + 1);
+      if (e.key === "ArrowRight") {
+        if (currentSlide < totalSlides - 1) {
+          setCurrentSlide(currentSlide + 1);
+        } else if (currentSlide === totalSlides - 1) {
+          onClose();
+        }
       } else if (e.key === "ArrowLeft" && currentSlide > 0) {
         setCurrentSlide(currentSlide - 1);
-      } else if (
-        e.key === "Enter" &&
-        currentSlide === slides.slide.length - 1
-      ) {
+      } else if (e.key === "Enter" && currentSlide === totalSlides - 1) {
         onClose();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentSlide, slides, onClose]);
+  }, [currentSlide, totalSlides, onClose]);
 
   // モーダルが開いているときにバックグラウンドのスクロールをロック
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const currentSlideData = slides.slide[currentSlide];
-  const isLastSlide = currentSlide === slides.slide.length - 1;
-
   const renderSlideContent = () => {
+    // 既存のスライドの場合
+    if (currentSlide < slides.slide.length) {
+      const currentSlideData = slides.slide[currentSlide];
+      return (
+        <div
+          className="slide-content"
+          dangerouslySetInnerHTML={{ __html: currentSlideData.content }}
+        />
+      );
+    }
+    // 演習に進む専用のスライド（最後のページ+1）
     return (
-      <div
-        className="slide-content"
-        dangerouslySetInnerHTML={{ __html: currentSlideData.content }}
-      />
+      <div className="flex flex-col items-center justify-center h-full">
+        <h2 className="text-2xl md:text-3xl font-bold mb-4">
+          演習に進む
+        </h2>
+        <p className="mb-8 text-center">
+          以下のボタンをクリックして、実際の演習に進みます。
+        </p>
+        <button
+          onClick={onClose}
+          className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
+          演習を開始する
+        </button>
+      </div>
     );
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div
-        className={`w-[98%] h-[90vh] md:h-[800px] rounded-lg relative bg-white text-black`}
-      >
+      <div className="w-[98%] h-[90vh] md:h-[800px] rounded-lg relative bg-white text-black">
         {/* Close button */}
         <button
           onClick={onClose}
@@ -116,7 +136,7 @@ export default function SlideModal({
           </div>
 
           {/* Navigation buttons */}
-          <div className="flex justify-between items-center px-4 md:px-8 py-4 md:py-6  bg-inherit">
+          <div className="flex justify-between items-center px-4 md:px-8 py-4 md:py-6 bg-inherit">
             <button
               onClick={() => setCurrentSlide(currentSlide - 1)}
               className={`p-3 md:p-2 rounded text-base md:text-base ${
@@ -129,7 +149,7 @@ export default function SlideModal({
               ← 前へ
             </button>
             <div className="text-current text-base md:text-base">
-              {currentSlide + 1} / {slides.slide.length}
+              {currentSlide + 1} / {totalSlides}
             </div>
             <button
               onClick={() => {
