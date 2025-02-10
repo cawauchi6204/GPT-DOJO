@@ -76,20 +76,20 @@ export default function SlideModal({
         />
       );
     }
-    // 演習に進む専用のスライド（最後のページ+1）
+    // 演習に進む専用のスライド(最後のページ+1)
     return (
-      <div className="flex flex-col items-center justify-center h-full">
-        <h2 className="text-2xl md:text-3xl font-bold mb-4">
-          演習に進む
+      <div className="flex flex-col items-center justify-center h-full bg-white">
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800">
+          ここでスライドは終わりです。
         </h2>
-        <p className="mb-8 text-center">
-          以下のボタンをクリックして、実際の演習に進みます。
+        <p className="mb-8 text-center text-gray-700">
+          演習に進みましょう!
         </p>
         <button
           onClick={onClose}
-          className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          className="px-8 py-4 bg-[#19C37D] text-white rounded-lg transition-colors duration-200 flex items-center gap-2 text-lg"
         >
-          演習を開始する
+          演習に進む ▶
         </button>
       </div>
     );
@@ -130,7 +130,7 @@ export default function SlideModal({
                 transition={{ duration: 0.1, ease: "easeInOut" }}
                 className="h-full items-start flex justify-center px-4 py-8 md:p-12"
               >
-                <div className="w-full max-w-6xl">{renderSlideContent()}</div>
+                <div className="w-full max-w-6xl h-full">{renderSlideContent()}</div>
               </motion.div>
             </AnimatePresence>
           </div>
