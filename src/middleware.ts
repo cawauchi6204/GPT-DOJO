@@ -4,9 +4,9 @@ export default clerkMiddleware();
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
+    // トップページを除外し、認証が必要なルートを指定
+    "/((?!_next|^$|[\\/]$|sign-in|sign-up|[^?]*\\.[^?]*$).*)",
+    // API routesを含める
+    "/(api|trpc)(.*)",
   ],
 };

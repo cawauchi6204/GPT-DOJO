@@ -2,13 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import localFont from "next/font/local";
-import {
-  ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const geistMono = localFont({
   src: [
@@ -100,12 +94,6 @@ export default function RootLayout({
         <body
           className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
         >
-          <SignedOut>
-            <SignInButton />
-          </SignedOut>
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
           {children}
           <Analytics />
         </body>
