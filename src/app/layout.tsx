@@ -2,6 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import localFont from "next/font/local";
+import {
+  ClerkProvider,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 
 const geistMono = localFont({
   src: [
@@ -25,7 +32,8 @@ const geist = localFont({
   variable: "--font-geist",
 });
 
-const defaultDescription = "GPT Dojoは、ChatGPTの使い方をハンズオン形式で学べるオンライン学習プラットフォームです。初心者から上級者まで、ステップバイステップで学習できます。";
+const defaultDescription =
+  "GPT Dojoは、ChatGPTの使い方をハンズオン形式で学べるオンライン学習プラットフォームです。初心者から上級者まで、ステップバイステップで学習できます。";
 const defaultOgImage = {
   url: "/images/ogp.png",
   width: 800,
@@ -34,13 +42,22 @@ const defaultOgImage = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  ),
   title: {
     default: "GPT DOJO - 今日から生成AIを味方にしよう",
     template: "%s | GPT DOJO",
   },
   description: defaultDescription,
-  keywords: ["プロンプト", "プロンプトエンジニアリング", "学習", "AI", "GPT", "教育"],
+  keywords: [
+    "プロンプト",
+    "プロンプトエンジニアリング",
+    "学習",
+    "AI",
+    "GPT",
+    "教育",
+  ],
   authors: [{ name: "GPT DOJO Team" }],
   openGraph: {
     type: "website",
@@ -78,13 +95,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ja">
-      <body
-        className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
-      >
-        {children}
-        <Analytics />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="ja">
+        <body
+          className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
+        >
+          <SignedOut>
+            <SignInButton />
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+          {children}
+          <Analytics />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
