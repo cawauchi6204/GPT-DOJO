@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "@/app/globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import localFont from "next/font/local";
+import NoAuthHeader from "@/components/layout/NoAuthHeader";
 
 const geistMono = localFont({
   src: [
@@ -91,8 +92,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
+      <NoAuthHeader />
       <body
-        className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
+        className={`${geist.variable} ${geistMono.variable} font-sans antialiased pt-16`}
       >
         {children}
         <Analytics />
