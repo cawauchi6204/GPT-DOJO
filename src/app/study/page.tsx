@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { lessonRepository } from "@/lib/supabase/client";
 import { slideRepository } from "@/lib/microcms/client";
 import StudyClient from "@/app/study/StudyClient";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   if (!searchParams.lessonId) {
@@ -36,14 +37,7 @@ export default async function StudyPage({ searchParams }: Props) {
     const { userId } = await auth();
 
     if (!userId) {
-      return (
-        <StudyClient
-          error={{
-            title: "認証エラー",
-            message: "このページにアクセスするにはログインが必要です",
-          }}
-        />
-      );
+      redirect("/sign-in");
     }
 
     if (!searchParams.lessonId) {

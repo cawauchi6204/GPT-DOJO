@@ -5,6 +5,7 @@ import Link from "next/link";
 import { courseRepository } from "@/lib/supabase/client";
 import Image from "next/image";
 import { Database } from "@/database.types";
+import { redirect } from "next/navigation";
 
 type Course = Database["public"]["Tables"]["courses"]["Row"];
 
@@ -72,16 +73,7 @@ export default async function Courses() {
     const { userId } = await auth();
 
     if (!userId) {
-      return (
-        <Layout>
-          <div className="max-w-7xl mx-auto px-4 py-6 md:py-12">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <h1 className="text-red-800 font-semibold mb-2">認証エラー</h1>
-              <p className="text-red-600">このページにアクセスするにはログインが必要です</p>
-            </div>
-          </div>
-        </Layout>
-      );
+      redirect("/sign-in");
     }
 
     const courses = await fetchCourses();

@@ -1,53 +1,45 @@
-import Link from "next/link";
-import Image from "next/image";
+import Image from 'next/image'
+import Link from 'next/link'
 
-export default function NoAuthHeader() {
+const NoAuthHeader = () => {
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-white shadow-sm z-50">
-      <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
-        <Link
-          href="/"
-          className="flex items-center text-xl md:text-2xl font-bold text-gray-900 hover:text-gray-700 transition-colors"
-        >
-          <span>GPT Dojo</span>
-          <Image
-            src="/images/dog_mono.png"
-            alt="GPT Dojo"
-            width={50}
-            height={50}
-            className="ml-2 mb-2"
-          />
-        </Link>
-
-        <nav>
-          <ul className="flex items-center space-x-2 md:space-x-6">
-            <li>
-              <Link
-                href="/courses"
-                className="text-sm md:text-base text-gray-600 hover:text-gray-900 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                コース一覧
-              </Link>
-            </li>
-            <li>
-              <a
-                href="/sign-in"
-                className="text-sm md:text-base text-gray-600 hover:text-gray-900 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                ログイン
-              </a>
-            </li>
-            <li>
-              <a
-                href="/sign-up"
-                className="text-sm md:text-base text-gray-600 hover:text-gray-900 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                無料会員登録
-              </a>
-            </li>
-          </ul>
-        </nav>
+    <header className="bg-white shadow">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
+          <Link href="/" className="flex items-center space-x-2">
+            <Image
+              src="/images/dog_mono.png"
+              alt="GPT Dojo"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
+            <span className="text-xl font-bold text-gray-900">GPT Dojo</span>
+          </Link>
+          <nav>
+            <ul className="flex items-center space-x-4">
+              <li>
+                <Link
+                  href="/sign-in"
+                  className="px-4 py-2 text-gray-600 hover:text-gray-900"
+                >
+                  ログイン
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/sign-up"
+                  className="rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
+                >
+                  新規登録
+                </Link>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </div>
     </header>
-  );
+  )
 }
+
+export default NoAuthHeader

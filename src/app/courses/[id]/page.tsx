@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { courseRepository, lessonRepository } from "@/lib/supabase/client";
 import Layout from "@/components/layout/Layout";
 import type { Database } from "@/database.types";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
@@ -38,20 +39,7 @@ export default async function CoursePage({ params }: Props) {
     const { userId } = await auth();
 
     if (!userId) {
-      return (
-        <Layout>
-          <div className="min-h-screen bg-gray-50 py-12">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <h1 className="text-red-800 font-semibold mb-2">認証エラー</h1>
-                <p className="text-red-600">
-                  このページにアクセスするにはログインが必要です
-                </p>
-              </div>
-            </div>
-          </div>
-        </Layout>
-      );
+      redirect("/sign-in");
     }
 
     const [course, lessons] = await Promise.all([
