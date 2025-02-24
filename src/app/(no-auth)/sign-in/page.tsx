@@ -1,15 +1,6 @@
 import { SignIn } from "@clerk/nextjs";
-import { redirect } from 'next/navigation';
-import { auth } from "@clerk/nextjs/server";
 
-export default async function SignInPage() {
-  const session = await auth();
-  
-  // すでにログインしている場合は/coursesにリダイレクト
-  if (session?.userId) {
-    redirect('/courses');
-  }
-
+export default function SignInPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
@@ -23,7 +14,8 @@ export default async function SignInPage() {
               card: "shadow-none",
               headerTitle: "hidden",
               headerSubtitle: "hidden",
-              socialButtonsBlockButton: "border border-gray-300 hover:bg-gray-50",
+              socialButtonsBlockButton:
+                "border border-gray-300 hover:bg-gray-50",
               formFieldInput:
                 "border-gray-300 focus:border-[#19c37d] focus:ring-[#19c37d]",
               footerActionLink: "text-[#19c37d] hover:text-[#1a8870]",

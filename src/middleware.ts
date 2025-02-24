@@ -1,5 +1,5 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
- 
+
 // Protect all routes except public ones
 export default clerkMiddleware();
 
@@ -11,9 +11,6 @@ export const config = {
      * - _next/image (画像最適化ファイル)
      * - favicon.ico (ファビコン)
      * - public folder
-     * - /sign-in (サインインページ)
-     * - /sign-up (サインアップページ)
-     * - / (トップページ)
      */
     "/((?!_next/static|_next/image|favicon.ico|public|sign-in|sign-up|$).*)",
     /*
