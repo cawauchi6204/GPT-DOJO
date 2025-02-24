@@ -7,14 +7,14 @@ export default async function SignUpPage() {
         <SignUp
           appearance={{
             elements: {
-              formButtonPrimary: "bg-[#19c37d] hover:bg-[#1a8870]",
+              formButtonPrimary: "bg-purple-600 hover:bg-purple-700 rounded-xl transform transition-all duration-200 hover:scale-105",
               card: "shadow-none",
               headerTitle: "hidden",
               headerSubtitle: "hidden",
-              socialButtonsBlockButton: "border border-gray-300 hover:bg-gray-50",
+              socialButtonsBlockButton: "border border-gray-300 hover:bg-gray-50 rounded-xl transition-all duration-200 hover:shadow-md",
               formFieldInput:
-                "border-gray-300 focus:border-[#19c37d] focus:ring-[#19c37d]",
-              footerActionLink: "text-[#19c37d] hover:text-[#1a8870]",
+                "border-gray-300 focus:border-purple-600 focus:ring-purple-600 rounded-lg transition-all duration-200",
+              footerActionLink: "text-purple-600 hover:text-purple-700 transition-colors duration-200",
             },
           }}
           redirectUrl={"/courses"}
