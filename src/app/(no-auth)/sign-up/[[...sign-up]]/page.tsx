@@ -2,11 +2,8 @@ import { SignUp } from "@clerk/nextjs";
 
 export default async function SignUpPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
-        <h1 className="mb-6 text-center text-2xl font-bold text-gray-900">
-          新規登録
-        </h1>
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="w-full max-w-md rounded-lg p-8 shadow-lg">
         <SignUp
           appearance={{
             elements: {

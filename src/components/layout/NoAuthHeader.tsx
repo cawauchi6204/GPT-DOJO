@@ -30,20 +30,20 @@ export default function NoAuthHeader() {
               </Link>
             </li>
             <li>
-              <Link
+              <a
                 href="/sign-in"
                 className="text-sm md:text-base text-gray-600 hover:text-gray-900 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 ログイン
-              </Link>
+              </a>
             </li>
             <li>
-              <Link
+              <a
                 href="/sign-up"
                 className="text-sm md:text-base text-gray-600 hover:text-gray-900 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 無料会員登録
-              </Link>
+              </a>
             </li>
           </ul>
         </nav>
