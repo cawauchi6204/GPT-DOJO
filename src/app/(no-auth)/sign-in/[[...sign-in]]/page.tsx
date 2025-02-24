@@ -1,6 +1,15 @@
 import { SignIn } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 
-export default function SignInPage() {
+export default async function SignInPage() {
+  const session = await auth();
+
+  // すでにログインしている場合は/coursesにリダイレクト
+  if (session?.userId) {
+    redirect("/courses");
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
@@ -21,6 +30,7 @@ export default function SignInPage() {
               footerActionLink: "text-[#19c37d] hover:text-[#1a8870]",
             },
           }}
+          afterSignInUrl={"/courses"}
           redirectUrl={"/courses"}
           routing="path"
           path="/sign-in"

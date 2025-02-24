@@ -31,10 +31,10 @@ export default function NoAuthHeader() {
             </li>
             <li>
               <Link
-                href="/sign-in"
+                href="/sign-up"
                 className="text-sm md:text-base text-gray-600 hover:text-gray-900 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                ログイン
+                新規登録
               </Link>
             </li>
           </ul>

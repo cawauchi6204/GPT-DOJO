@@ -92,11 +92,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <NoAuthHeader />
       <body
-        className={`${geist.variable} ${geistMono.variable} font-sans antialiased pt-16`}
+        className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
       >
-        {children}
+        <NoAuthHeader />
+        <main className="pt-16">
+          {children}
+        </main>
         <Analytics />
       </body>
     </html>
