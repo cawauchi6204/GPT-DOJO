@@ -11,7 +11,11 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
 import Image from "next/image";
-import ReactConfetti from "react-confetti";
+import dynamic from "next/dynamic";
+
+const ReactConfetti = dynamic(() => import("react-confetti"), {
+  ssr: false
+});
 
 type Message = {
   id: string;
@@ -202,11 +206,11 @@ export default function StudyClient({
           gravity={0.3}
           wind={0}
           confettiSource={{
-            x: 0,
-            y: 0,
-            w: window.innerWidth,
-            h: 0,
-          }}
+                    x: 0,
+                    y: 0,
+                    w: typeof window !== 'undefined' ? window.innerWidth : 1000,
+                    h: 0,
+                  }}
         />
       )}
       <div className="flex flex-col h-screen overflow-hidden">

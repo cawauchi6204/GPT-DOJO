@@ -12,7 +12,7 @@ export const config = {
      * - favicon.ico (ファビコン)
      * - public folder
      */
-    "/((?!_next/static|_next/image|favicon.ico|public|sign-in|$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|public|sign-in|sign-up|$).*)",
     /*
      * 明示的に保護するパス:
      * - /study

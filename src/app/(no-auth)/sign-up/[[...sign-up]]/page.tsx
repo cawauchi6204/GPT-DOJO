@@ -1,15 +1,6 @@
 import { SignUp } from "@clerk/nextjs";
-import { redirect } from 'next/navigation';
-import { auth } from "@clerk/nextjs/server";
 
 export default async function SignUpPage() {
-  const session = await auth();
-  
-  // すでにログインしている場合は/coursesにリダイレクト
-  if (session?.userId) {
-    redirect('/courses');
-  }
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
