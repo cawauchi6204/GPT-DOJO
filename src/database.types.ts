@@ -122,8 +122,10 @@ export type Database = {
           description: string | null
           duration: number
           id: string
+          is_free: boolean | null
           is_published: boolean | null
           level: string
+          price: number | null
           subtitle: string | null
           thumbnail_url: string | null
           title: string
@@ -135,8 +137,10 @@ export type Database = {
           description?: string | null
           duration: number
           id?: string
+          is_free?: boolean | null
           is_published?: boolean | null
           level: string
+          price?: number | null
           subtitle?: string | null
           thumbnail_url?: string | null
           title: string
@@ -148,8 +152,10 @@ export type Database = {
           description?: string | null
           duration?: number
           id?: string
+          is_free?: boolean | null
           is_published?: boolean | null
           level?: string
+          price?: number | null
           subtitle?: string | null
           thumbnail_url?: string | null
           title?: string

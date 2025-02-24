@@ -4,6 +4,9 @@ import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { courseRepository } from "@/lib/supabase/client";
 import Image from "next/image";
+import { Database } from "@/database.types";
+
+type Course = Database["public"]["Tables"]["courses"]["Row"];
 
 export const metadata: Metadata = {
   title: "コース一覧",
@@ -18,6 +21,50 @@ async function fetchCourses() {
     console.error("Error fetching courses:", error);
     return [];
   }
+}
+
+function CourseCard({ course }: { course: Course }) {
+  return (
+    <Link
+      href={`/courses/${course.id}`}
+      className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 md:p-6"
+    >
+      <div className="aspect-video rounded-lg mb-4 relative">
+        <Image
+          src={course.thumbnail_url || "/images/lesson-icon.png"}
+          alt={`${course.title}のサムネイル`}
+          fill
+          className="object-cover rounded-lg"
+        />
+      </div>
+      <div className="flex justify-between items-start mb-2">
+        <h2 className="text-lg md:text-xl font-semibold">
+          {course.title}
+        </h2>
+        <div className={`px-2 py-1 rounded text-sm ${course.is_free ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
+          {course.is_free ? '無料' : `¥${course.price?.toLocaleString()}`}
+        </div>
+      </div>
+      <p className="text-sm md:text-base text-gray-600 mb-4">
+        {course.description}
+      </p>
+    </Link>
+  );
+}
+
+function CourseSection({ title, courses }: { title: string; courses: Course[] }) {
+  if (courses.length === 0) return null;
+
+  return (
+    <div className="mb-8">
+      <h2 className="text-xl font-bold mb-4">{title}</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        {courses.map((course) => (
+          <CourseCard key={course.id} course={course} />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default async function Courses() {
@@ -38,6 +85,8 @@ export default async function Courses() {
     }
 
     const courses = await fetchCourses();
+    const freeCourses = courses.filter(course => course.is_free);
+    const paidCourses = courses.filter(course => !course.is_free);
 
     return (
       <Layout>
@@ -46,42 +95,20 @@ export default async function Courses() {
             コース一覧
           </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {courses.map((course) => (
-              <Link
-                key={course.id}
-                href={`/courses/${course.id}`}
-                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 md:p-6"
-              >
-                <div className="aspect-video rounded-lg mb-4 relative">
-                  <Image
-                    src={course.thumbnail_url || "/images/lesson-icon.png"}
-                    alt={`${course.title}のサムネイル`}
-                    fill
-                    className="object-cover rounded-lg"
-                  />
-                </div>
-                <h2 className="text-lg md:text-xl font-semibold mb-2">
-                  {course.title}
-                </h2>
-                <p className="text-sm md:text-base text-gray-600 mb-4">
-                  {course.description}
-                </p>
-              </Link>
-            ))}
+          <CourseSection title="無料コース" courses={freeCourses} />
+          <CourseSection title="有料コース" courses={paidCourses} />
 
-            {courses.length === 0 && (
-              <div className="bg-white rounded-lg shadow-md p-4 md:p-6 opacity-50">
-                <div className="aspect-video bg-gray-100 rounded-lg mb-4"></div>
-                <h2 className="text-lg md:text-xl font-semibold mb-2">
-                  コースがありません
-                </h2>
-                <p className="text-sm md:text-base text-gray-600 mb-4">
-                  新しいコースを準備中です。お楽しみに!
-                </p>
-              </div>
-            )}
-          </div>
+          {courses.length === 0 && (
+            <div className="bg-white rounded-lg shadow-md p-4 md:p-6 opacity-50">
+              <div className="aspect-video bg-gray-100 rounded-lg mb-4"></div>
+              <h2 className="text-lg md:text-xl font-semibold mb-2">
+                コースがありません
+              </h2>
+              <p className="text-sm md:text-base text-gray-600 mb-4">
+                新しいコースを準備中です。お楽しみに!
+              </p>
+            </div>
+          )}
         </div>
       </Layout>
     );
