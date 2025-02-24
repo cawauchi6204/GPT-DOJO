@@ -1,46 +1,29 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
-import { NextRequest, NextResponse } from 'next/server';
-import { authRoutes, publicRoutes } from './constants/auth';
-
-const isPublicRoute = (pathname: string) => {
-  return publicRoutes.includes(pathname) ||
-    pathname.startsWith('/_next/') ||
-    pathname.startsWith('/public/') ||
-    pathname.startsWith('/images/') ||
-    pathname === '/favicon.ico';
-};
-
-export async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req, res });
-  const pathname = req.nextUrl.pathname;
-
-  // セッションの更新
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  // 認証ルートにいて、すでにログインしている場合はダッシュボードにリダイレクト
-  if (authRoutes.includes(pathname)) {
-    if (session) {
-      return NextResponse.redirect(new URL('/dashboard', req.url));
-    }
-    return res;
-  }
-
-  // パブリックルートの場合は認証不要
-  if (isPublicRoute(pathname)) {
-    return res;
-  }
-
-  // 認証が必要なルートで、セッションがない場合はサインインページにリダイレクト
-  if (!session) {
-    return NextResponse.redirect(new URL('/sign-in', req.url));
-  }
-
-  return res;
-}
+import { clerkMiddleware } from "@clerk/nextjs/server";
+ 
+// Protect all routes except public ones
+export default clerkMiddleware();
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    /*
+     * 以下のパスを除外して、それ以外のすべてのパスを保護:
+     * - _next/static (静的ファイル)
+     * - _next/image (画像最適化ファイル)
+     * - favicon.ico (ファビコン)
+     * - public folder
+     * - /sign-in (サインインページ)
+     * - /sign-up (サインアップページ)
+     * - / (トップページ)
+     */
+    "/((?!_next/static|_next/image|favicon.ico|public|sign-in|sign-up|$).*)",
+    /*
+     * 明示的に保護するパス:
+     * - /study
+     * - /dashboard
+     * - /courses
+     */
+    "/study/:path*",
+    "/dashboard/:path*",
+    "/courses/:path*",
+  ],
 };
